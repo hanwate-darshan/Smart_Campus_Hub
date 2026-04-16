@@ -1,0 +1,44 @@
+const express = require("express");
+const multer = require("multer");
+const { 
+  createListing, 
+  getListings, 
+  getListingDetails, 
+  updateListingStatus, 
+  markAsSold, 
+  reportListing 
+} = require("./listing.controller");
+const { authenticate } = require("../../middleware/auth.middleware");
+const { requireRole } = require("../../middleware/role.middleware");
+
+const router = express.Router();
+
+// Multer Config
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB per image
+});
+
+const { cacheMiddleware } = require("../../utils/cache");
+
+router.use(authenticate);
+
+// Student Routes
+router.post("/", requireRole("student"), upload.array("images", 3), createListing);
+router.get("/", requireRole("student"), cacheMiddleware, getListings);
+router.get("/:id", requireRole("student"), getListingDetails);
+router.patch("/:id/sold", requireRole("student"), markAsSold);
+router.post("/:id/report", requireRole("student"), reportListing);
+
+// Admin Routes
+router.patch("/:id/approve", requireRole("admin"), (req, res, next) => {
+  req.body.status = "approved";
+  updateListingStatus(req, res, next);
+});
+
+router.patch("/:id/reject", requireRole("admin"), (req, res, next) => {
+  req.body.status = "rejected";
+  updateListingStatus(req, res, next);
+});
+
+module.exports = router;
