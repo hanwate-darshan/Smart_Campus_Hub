@@ -257,7 +257,7 @@ export default function RegisterPage() {
                     <div className="relative">
                       <div className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: focused === 'name' ? accent : '#5f6368' }}><User className="w-4 h-4" /></div>
                       <input name="name" type="text" value={form.name} onChange={handleChange} onFocus={() => setFocused('name')} onBlur={() => setFocused(null)}
-                        placeholder="John Doe" className="w-full pl-10 pr-4 py-3 rounded-xl text-[13px] transition-all duration-200 focus:outline-none placeholder:text-[#5f6368]" style={inputCls('name')} />
+                        placeholder="Enter your full name" className="w-full pl-10 pr-4 py-3 rounded-xl text-[13px] transition-all duration-200 focus:outline-none placeholder:text-[#5f6368]" style={inputCls('name')} />
                     </div>
                     {errors.name && <p className="mt-1 text-[11px] text-[#f28b82] flex items-center gap-1"><AlertTriangle className="w-3 h-3" />{errors.name}</p>}
                   </div>
@@ -267,7 +267,7 @@ export default function RegisterPage() {
                     <div className="relative">
                       <div className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: focused === 'email' ? accent : '#5f6368' }}><Mail className="w-4 h-4" /></div>
                       <input name="email" type="email" value={form.email} onChange={handleChange} onFocus={() => setFocused('email')} onBlur={() => setFocused(null)}
-                        placeholder="you@college.edu" className="w-full pl-10 pr-4 py-3 rounded-xl text-[13px] transition-all duration-200 focus:outline-none placeholder:text-[#5f6368]" style={inputCls('email')} />
+                        placeholder="Enter your college email" className="w-full pl-10 pr-4 py-3 rounded-xl text-[13px] transition-all duration-200 focus:outline-none placeholder:text-[#5f6368]" style={inputCls('email')} />
                     </div>
                     {errors.email && <p className="mt-1 text-[11px] text-[#f28b82] flex items-center gap-1"><AlertTriangle className="w-3 h-3" />{errors.email}</p>}
                   </div>
@@ -277,13 +277,13 @@ export default function RegisterPage() {
                     <div className="relative">
                       <div className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: focused === 'phone' ? accent : '#5f6368' }}><Phone className="w-4 h-4" /></div>
                       <input name="phone" type="tel" value={form.phone} onChange={handleChange} onFocus={() => setFocused('phone')} onBlur={() => setFocused(null)}
-                        placeholder="10-digit number" className="w-full pl-10 pr-4 py-3 rounded-xl text-[13px] transition-all duration-200 focus:outline-none placeholder:text-[#5f6368]" style={inputCls('phone')} />
+                        placeholder="Enter your 10-digit number" className="w-full pl-10 pr-4 py-3 rounded-xl text-[13px] transition-all duration-200 focus:outline-none placeholder:text-[#5f6368]" style={inputCls('phone')} />
                     </div>
                     {errors.phone && <p className="mt-1 text-[11px] text-[#f28b82] flex items-center gap-1"><AlertTriangle className="w-3 h-3" />{errors.phone}</p>}
                   </div>
 
                   <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} type="button" onClick={nextStep}
-                    className="w-full py-3 rounded-xl text-[13px] font-semibold mt-4 transition-all"
+                    className="w-full py-3 rounded-xl text-[13px] font-semibold mt-4 transition-all cursor-pointer"
                     style={{ background: accent, color: '#131314', boxShadow: `0 4px 14px ${accent}25` }}>
                     Continue →
                   </motion.button>
@@ -341,7 +341,7 @@ export default function RegisterPage() {
                       ← Back
                     </motion.button>
                     <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} type="button" onClick={nextStep}
-                      className="flex-1 py-3 rounded-xl text-[13px] font-semibold transition-all"
+                      className="flex-1 py-3 rounded-xl text-[13px] font-semibold transition-all cursor-pointer"
                       style={{ background: accent, color: '#131314', boxShadow: `0 4px 14px ${accent}25` }}>
                       Continue →
                     </motion.button>

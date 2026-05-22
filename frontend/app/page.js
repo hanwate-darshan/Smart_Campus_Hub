@@ -146,11 +146,7 @@ export default function LandingPage() {
           ))}
         </motion.div>
 
-        {/* Footer */}
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
-          className="mt-14 text-center text-[11px] text-[#5f6368]">
-          © {new Date().getFullYear()} Smart Campus Hub. Built with ❤️ for campus life.
-        </motion.p>
+
       </div>
     </main>
   );

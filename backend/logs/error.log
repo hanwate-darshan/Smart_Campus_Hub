@@ -95,3 +95,4 @@
 [31m    at model.Query.exec (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\mongoose\lib\query.js:4726:80)[39m
 [31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
 [31m    at async exports.cancelSOS (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\sos\sos.controller.js:64:17)[39m
+2026-04-17 20:07:46:746 [31merror[39m: [31mUNCAUGHT EXCEPTION! 💥 Shutting down...[39m

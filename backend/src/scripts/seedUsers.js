@@ -67,13 +67,13 @@ const seedUsers = async () => {
     }
 
     await mongoose.connect(mongoUri);
-    console.log("✅ Connected to MongoDB...");
+    console.log(" Connected to MongoDB...");
 
     for (const userData of usersToCreate) {
       const existingUser = await User.findOne({ email: userData.email });
       
       if (existingUser) {
-        console.log(`ℹ️ User already exists: ${userData.email} (${userData.role}) - Skipping.`);
+        console.log(` User already exists: ${userData.email} (${userData.role}) - Skipping.`);
         continue;
       }
 
