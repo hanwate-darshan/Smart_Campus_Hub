@@ -94,6 +94,32 @@ const suspendUser = async (req, res) => {
   }
 };
 
+const unblockUser = async (req, res) => {
+  try {
+    await adminService.unblockUser(req.params.id);
+    res.status(200).json({ success: true, message: 'User unblocked successfully' });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({
+      success: false,
+      error: err.message,
+      message: 'Failed to unblock user',
+    });
+  }
+};
+
+const deleteUser = async (req, res) => {
+  try {
+    await adminService.deleteUser(req.params.id);
+    res.status(200).json({ success: true, message: 'User deleted successfully' });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({
+      success: false,
+      error: err.message,
+      message: 'Failed to delete user',
+    });
+  }
+};
+
 const getDashboardStats = async (req, res) => {
   try {
     const stats = await adminService.getDashboardStats();
@@ -114,5 +140,7 @@ module.exports = {
   createUser,
   listUsers,
   suspendUser,
+  unblockUser,
+  deleteUser,
   getDashboardStats,
 };

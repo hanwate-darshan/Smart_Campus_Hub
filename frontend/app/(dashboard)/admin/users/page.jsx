@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { formatDistanceToNow } from "date-fns";
 import toast from "react-hot-toast";
-import { Plus, Loader2, X, AlertTriangle, UserPlus, Mail, Lock, Phone, ShieldCheck } from "lucide-react";
+import { Plus, Loader2, X, AlertTriangle, UserPlus, Mail, Lock, Phone, ShieldCheck, Trash2, Ban, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -14,6 +14,7 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
   
   const [form, setForm] = useState({
     name: "",
@@ -67,6 +68,34 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleAction = async (action, userId) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (action === 'delete') {
+        if (!confirm("Are you sure you want to delete this user?")) return;
+        await axios.delete(`${API_BASE}/api/admin/users/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success("User deleted successfully");
+      } else if (action === 'block') {
+        if (!confirm("Are you sure you want to block this user?")) return;
+        await axios.patch(`${API_BASE}/api/admin/users/${userId}/suspend`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success("User blocked successfully");
+      } else if (action === 'unblock') {
+        if (!confirm("Are you sure you want to unblock this user?")) return;
+        await axios.patch(`${API_BASE}/api/admin/users/${userId}/unblock`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success("User unblocked successfully");
+      }
+      fetchUsers();
+    } catch (err) {
+      toast.error(`Failed to ${action} user`);
+    }
+  };
+
   const getRoleColor = (role) => {
     switch(role) {
       case 'admin': return 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400';
@@ -75,6 +104,16 @@ export default function AdminUsersPage() {
       default: return 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
     }
   };
+
+  const tabs = [
+    { id: 'all', label: 'All Users' },
+    { id: 'student', label: 'Students' },
+    { id: 'teacher', label: 'Teachers' },
+    { id: 'security', label: 'Security' },
+    { id: 'admin', label: 'Admins' }
+  ];
+
+  const filteredUsers = activeTab === 'all' ? users : users.filter(user => user.role === activeTab);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -97,6 +136,32 @@ export default function AdminUsersPage() {
         </button>
       </div>
 
+      {/* Tabs Navigation */}
+      <div className="flex overflow-x-auto border-b border-slate-200 dark:border-slate-800 hide-scrollbar mb-2">
+        <div className="flex gap-6">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`pb-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${
+                activeTab === tab.id
+                  ? "border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400"
+                  : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300 dark:hover:border-slate-700"
+              }`}
+            >
+              {tab.label}
+              <span className={`text-xs py-0.5 px-2 rounded-full ${
+                activeTab === tab.id 
+                  ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' 
+                  : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+              }`}>
+                {tab.id === 'all' ? users.length : users.filter(u => u.role === tab.id).length}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {loading ? (
         <div className="flex h-64 items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
@@ -111,10 +176,11 @@ export default function AdminUsersPage() {
                   <th className="p-4 font-semibold">Role</th>
                   <th className="p-4 font-semibold">Status</th>
                   <th className="p-4 font-semibold hidden md:table-cell">Joined</th>
+                  <th className="p-4 font-semibold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                   <tr key={user._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
@@ -144,12 +210,40 @@ export default function AdminUsersPage() {
                     <td className="p-4 hidden md:table-cell text-sm text-slate-500 dark:text-slate-400">
                       {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
                     </td>
+                    <td className="p-4">
+                      <div className="flex items-center justify-end gap-2">
+                        {user.status === 'suspended' ? (
+                          <button
+                            onClick={() => handleAction('unblock', user._id)}
+                            className="p-2 rounded-xl text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
+                            title="Unblock User"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleAction('block', user._id)}
+                            className="p-2 rounded-xl text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-colors"
+                            title="Block User"
+                          >
+                            <Ban className="w-4 h-4" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleAction('delete', user._id)}
+                          className="p-2 rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                          title="Delete User"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
-                {users.length === 0 && (
+                {filteredUsers.length === 0 && (
                   <tr>
-                    <td colSpan="4" className="p-8 text-center text-slate-500">
-                      No users found.
+                    <td colSpan="5" className="p-8 text-center text-slate-500">
+                      No {activeTab === 'all' ? 'users' : activeTab + 's'} found.
                     </td>
                   </tr>
                 )}

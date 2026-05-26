@@ -211,6 +211,68 @@ const suspendUser = async (userId) => {
   return user;
 };
 
+const unblockUser = async (userId) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    const error = new Error('User not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  user.status = 'approved';
+  await user.save();
+
+  await ActivityLog.create({
+    type: 'account_unblocked',
+    message: `Unblocked account for ${user.name}`,
+    userId: user._id,
+  });
+
+  // Socket.io notification
+  try {
+    const io = getIO();
+    io.of('/notifications').to(`user:${userId}`).emit('notification_push', {
+      type: 'account_unblocked',
+      title: 'Account Reactivated',
+      message: 'Your account has been reactivated.',
+    });
+    
+    // Notify admins of activity
+    io.of('/notifications').to('admin').emit('new_activity');
+  } catch (err) {
+    console.error('Socket emit failed:', err.message);
+  }
+
+  return user;
+};
+
+const deleteUser = async (userId) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    const error = new Error('User not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  await User.findByIdAndDelete(userId);
+
+  await ActivityLog.create({
+    type: 'account_deleted',
+    message: `Deleted account for ${user.name}`,
+    // user._id is deleted, but we can still store the id string or leave it
+  });
+
+  // Socket.io notification
+  try {
+    const io = getIO();
+    io.of('/notifications').to('admin').emit('new_activity');
+  } catch (err) {
+    console.error('Socket emit failed:', err.message);
+  }
+
+  return true;
+};
+
 const getDashboardStats = async () => {
   const [
     totalStudents,
@@ -244,5 +306,7 @@ module.exports = {
   createUser,
   listUsers,
   suspendUser,
+  unblockUser,
+  deleteUser,
   getDashboardStats,
 };

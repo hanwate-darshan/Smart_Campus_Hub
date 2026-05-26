@@ -66,8 +66,10 @@ const seedUsers = async () => {
       throw new Error("MONGO_URI is not defined in .env file");
     }
 
-    await mongoose.connect(mongoUri);
-    console.log(" Connected to MongoDB...");
+    if (mongoose.connection.readyState === 0) {
+      await mongoose.connect(mongoUri);
+      console.log(" Connected to MongoDB for seeding...");
+    }
 
     for (const userData of usersToCreate) {
       const existingUser = await User.findOne({ email: userData.email });
@@ -98,11 +100,14 @@ const seedUsers = async () => {
     }
 
     console.log("\n✨ Seeding completed successfully!");
-    process.exit(0);
   } catch (err) {
     console.error("❌ Error seeding users:", err.message);
-    process.exit(1);
   }
 };
 
-seedUsers();
+// If run directly via CLI
+if (require.main === module) {
+  seedUsers().then(() => process.exit(0));
+}
+
+module.exports = seedUsers;

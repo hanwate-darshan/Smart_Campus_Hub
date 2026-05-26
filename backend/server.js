@@ -56,6 +56,12 @@ const startServer = async () => {
         await connectRedis();
         await initSocket(server);
         
+        // Auto-seed users in development
+        if (process.env.NODE_ENV !== 'production') {
+            const seedUsers = require('./src/scripts/seedUsers');
+            await seedUsers();
+        }
+        
         const { initArchiveJob } = require('./src/jobs/lostitem.archive');
         initArchiveJob();
 

@@ -8,6 +8,8 @@ const {
   createUser,
   listUsers,
   suspendUser,
+  unblockUser,
+  deleteUser,
   getDashboardStats,
 } = require('./admin.controller');
 
@@ -24,5 +26,7 @@ router.patch('/users/:id/reject', rejectUser);
 router.post('/create-user', createUser);
 router.get('/users', listUsers);
 router.patch('/users/:id/suspend', suspendUser);
+router.patch('/users/:id/unblock', unblockUser);
+router.delete('/users/:id', deleteUser);
 
 module.exports = router;
