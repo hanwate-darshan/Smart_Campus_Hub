@@ -49,8 +49,20 @@ const approveUser = async (userId) => {
   // Send approval email
   await sendEmail({
     to: user.email,
-    subject: 'Your Smart Campus Hub account is approved',
-    html: `<p>Hello ${user.name},</p><p>Your account has been approved. You can now login at Smart Campus Hub.</p>`,
+    subject: 'Registration Approved - Smart Campus Hub 🎉',
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #e5e7eb; border-radius: 16px; background-color: #ffffff;">
+        <h2 style="color: #4f46e5; margin-top: 0;">Registration Approved!</h2>
+        <p style="color: #374151; font-size: 16px;">Hello <strong>${user.name}</strong>,</p>
+        <p style="color: #374151; font-size: 16px; line-height: 1.5;">Great news! Your registration at <strong>Smart Campus Hub</strong> has been officially approved by the administration.</p>
+        <p style="color: #374151; font-size: 16px;">You can now log in to your account and start using the platform.</p>
+        <div style="margin-top: 25px; margin-bottom: 25px;">
+          <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/" style="display: inline-block; padding: 12px 24px; background-color: #4f46e5; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Login Now</a>
+        </div>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;" />
+        <p style="font-size: 12px; color: #9ca3af; margin: 0;">If you face any issues, please contact the campus administration.</p>
+      </div>
+    `,
   });
 
   return user;

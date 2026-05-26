@@ -148,21 +148,16 @@ exports.updateComplaintStatus = async (req, res, next) => {
 
     if (!complaint) return res.status(404).json({ success: false, error: "Complaint not found" });
 
-    // Status Transition Validation
-    const transitions = {
-      submitted: "in_review",
-      in_review: "in_progress",
-      in_progress: "resolved",
-      resolved: "closed",
-    };
+    const STATUS_ORDER = ["submitted", "in_review", "in_progress", "resolved", "closed"];
+    
+    if (!STATUS_ORDER.includes(status)) {
+      return res.status(400).json({ success: false, error: "Invalid status value" });
+    }
 
-    const isAdmin = req.user.role === "admin";
-    const isValidTransition = transitions[complaint.status] === status;
-
-    if (!isValidTransition && !(isAdmin && status === "closed")) {
+    if (complaint.status === status) {
       return res.status(400).json({
         success: false,
-        error: `Invalid transition from ${complaint.status} to ${status}`,
+        error: `Complaint is already ${status.replace("_", " ")}`,
       });
     }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import toast from "react-hot-toast";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -27,10 +27,7 @@ export default function CreateUserModal({ isOpen, onClose, role }) {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.post(`${API_BASE}/api/admin/create-user`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.post(`/api/admin/create-user`, formData);
       toast.success(`${formData.role === "teacher" ? "Teacher" : "Security"} account created!`);
       setFormData({ name: "", email: "", password: "", phone: "", role: role || "teacher" });
       onClose();

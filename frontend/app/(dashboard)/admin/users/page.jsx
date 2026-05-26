@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
 import toast from "react-hot-toast";
 import { Plus, Loader2, X, AlertTriangle, UserPlus, Mail, Lock, Phone, ShieldCheck, Trash2, Ban, CheckCircle } from "lucide-react";
@@ -27,10 +27,7 @@ export default function AdminUsersPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("accessToken");
-      const { data } = await axios.get(`${API_BASE}/api/admin/users?limit=50`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await api.get(`/api/admin/users?limit=50`);
       if (data.success) {
         setUsers(data.data);
       }
@@ -53,10 +50,7 @@ export default function AdminUsersPage() {
     e.preventDefault();
     setCreateLoading(true);
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.post(`${API_BASE}/api/admin/create-user`, form, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.post(`/api/admin/create-user`, form);
       toast.success(`${form.role} created successfully!`);
       setShowModal(false);
       setForm({ name: "", email: "", password: "", role: "teacher", phone: "" });
@@ -70,24 +64,17 @@ export default function AdminUsersPage() {
 
   const handleAction = async (action, userId) => {
     try {
-      const token = localStorage.getItem("accessToken");
       if (action === 'delete') {
         if (!confirm("Are you sure you want to delete this user?")) return;
-        await axios.delete(`${API_BASE}/api/admin/users/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.delete(`/api/admin/users/${userId}`);
         toast.success("User deleted successfully");
       } else if (action === 'block') {
         if (!confirm("Are you sure you want to block this user?")) return;
-        await axios.patch(`${API_BASE}/api/admin/users/${userId}/suspend`, {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.patch(`/api/admin/users/${userId}/suspend`);
         toast.success("User blocked successfully");
       } else if (action === 'unblock') {
         if (!confirm("Are you sure you want to unblock this user?")) return;
-        await axios.patch(`${API_BASE}/api/admin/users/${userId}/unblock`, {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.patch(`/api/admin/users/${userId}/unblock`);
         toast.success("User unblocked successfully");
       }
       fetchUsers();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
 import { io } from "socket.io-client";
 import Link from "next/link";
@@ -18,10 +18,7 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
-        const { data } = await axios.get(`${API_BASE}/api/admin/dashboard-stats`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data } = await api.get(`/api/admin/dashboard-stats`);
         if (data.success) {
           setStats(data.data);
         }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
@@ -18,10 +18,7 @@ export default function AdminApprovalsPage() {
 
   const fetchPendingUsers = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      const { data } = await axios.get(`${API_BASE}/api/admin/pending-users`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await api.get(`/api/admin/pending-users`);
       if (data.success) {
         setPendingUsers(data.data);
       }
@@ -62,10 +59,7 @@ export default function AdminApprovalsPage() {
   const handleApprove = async (id) => {
     setActionLoadingId(id);
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.patch(`${API_BASE}/api/admin/users/${id}/approve`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.patch(`/api/admin/users/${id}/approve`);
       toast.success("Student approved successfully");
       setPendingUsers((prev) => prev.filter((user) => user._id !== id));
     } catch (err) {
@@ -80,10 +74,7 @@ export default function AdminApprovalsPage() {
     const id = rejectionModalUser._id;
     setActionLoadingId(id);
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.patch(`${API_BASE}/api/admin/users/${id}/reject`, { reason: rejectReason }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.patch(`/api/admin/users/${id}/reject`, { reason: rejectReason });
       toast.success("Student rejected");
       setPendingUsers((prev) => prev.filter((user) => user._id !== id));
       setRejectionModalUser(null);
