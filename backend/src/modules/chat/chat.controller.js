@@ -38,6 +38,9 @@ exports.createRoom = async (req, res, next) => {
       type: "marketplace"
     });
 
+    // Increment interested count only for new chat rooms
+    await Listing.findByIdAndUpdate(listingId, { $inc: { interestedCount: 1 } });
+
     res.status(201).json({ success: true, data: room });
   } catch (err) {
     next(err);
@@ -48,7 +51,7 @@ exports.createRoom = async (req, res, next) => {
 exports.getRooms = async (req, res, next) => {
   try {
     const rooms = await ChatRoom.find({ participants: req.user._id })
-      .populate("participants", "name")
+      .populate("participants", "name lastActiveAt")
       .populate("listingId", "title")
       .sort({ lastMessageAt: -1 });
 
@@ -61,7 +64,8 @@ exports.getRooms = async (req, res, next) => {
         lastMessageAt: room.lastMessageAt,
         isLocked: room.isLocked,
         listingTitle: room.listingId?.title || "N/A",
-        otherParticipantName: otherUser?.name || "Unknown"
+        otherParticipantName: otherUser?.name || "Unknown",
+        otherParticipantLastActive: otherUser?.lastActiveAt || null
       };
     });
 
@@ -78,9 +82,24 @@ exports.getMessages = async (req, res, next) => {
     const { page = 1, limit = 50 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Verify participation
-    const room = await ChatRoom.findOne({ _id: roomId, participants: req.user._id });
+    // Verify participation and populate needed fields
+    const room = await ChatRoom.findOne({ _id: roomId, participants: req.user._id })
+      .populate("participants", "name lastActiveAt")
+      .populate("listingId", "title");
+      
     if (!room) return res.status(403).json({ success: false, error: "Access denied" });
+
+    const otherUser = room.participants.find(p => p._id.toString() !== req.user._id.toString());
+    const formattedRoom = {
+      _id: room._id,
+      type: room.type,
+      lastMessage: room.lastMessage,
+      lastMessageAt: room.lastMessageAt,
+      isLocked: room.isLocked,
+      listingTitle: room.listingId?.title || "N/A",
+      otherParticipantName: otherUser?.name || "Unknown",
+      otherParticipantLastActive: otherUser?.lastActiveAt || null
+    };
 
     const messages = await Message.find({ roomId })
       .sort({ createdAt: -1 }) // Newest first for DB fetch
@@ -96,7 +115,8 @@ exports.getMessages = async (req, res, next) => {
 
     res.json({ 
       success: true, 
-      data: messages.reverse() // Reverse for UI display (oldest to newest)
+      data: messages.reverse(), // Reverse for UI display (oldest to newest)
+      room: formattedRoom
     });
   } catch (err) {
     next(err);

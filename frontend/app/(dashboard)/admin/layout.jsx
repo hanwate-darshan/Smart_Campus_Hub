@@ -105,7 +105,8 @@ export default function AdminLayout({ children }) {
               <span className="text-[13px] text-[#9aa0a6] hidden sm:block">{user?.name || "Admin"}</span>
               <button
                 onClick={handleLogout}
-                className="text-[12px] px-3 py-1.5 rounded-lg text-[#9aa0a6] hover:bg-[#282a2c] hover:text-[#e8eaed] transition-colors font-medium"
+                className="text-[12px] px-3 py-1.5 rounded-lg font-medium cursor-pointer transition-all duration-300 hover:opacity-80"
+                style={{ background: '#c58af9', color: '#131314' }}
               >
                 Logout
               </button>

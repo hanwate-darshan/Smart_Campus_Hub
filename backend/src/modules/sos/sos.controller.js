@@ -14,7 +14,7 @@ exports.triggerSOS = async (req, res, next) => {
     const { latitude, longitude } = req.body;
     const studentId = req.user._id;
 
-    // Daily Limit Check
+    // ── Check 1: Daily Limit ──
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
     const sosCount = await SOS.countDocuments({ studentId, createdAt: { $gte: startOfDay } });
@@ -22,37 +22,123 @@ exports.triggerSOS = async (req, res, next) => {
       return res.status(429).json({ success: false, error: "SOS limit reached for today (Max 3/day)." });
     }
 
+    // ── Check 2: Already Active SOS ──
+    const existingActive = await SOS.findOne({
+      studentId,
+      status: { $in: ["active", "assigned", "reached"] }
+    });
+    if (existingActive) {
+      return res.status(409).json({
+        success: false,
+        error: "You already have an active SOS. Please cancel it before triggering a new one.",
+        data: { sosId: existingActive._id, status: existingActive.status }
+      });
+    }
+
+    // ── Check 3: Campus Boundary (Geofence) ──
+    const campusPolygonStr = process.env.CAMPUS_POLYGON_COORDS;
+    if (campusPolygonStr) {
+      const campusPolygon = parsePolygon(campusPolygonStr);
+      if (campusPolygon.length > 0) {
+        const isInsideCampus = isPointInPolygon([longitude, latitude], campusPolygon);
+        if (!isInsideCampus) {
+          return res.status(403).json({
+            success: false,
+            error: "SOS can only be triggered from inside campus boundaries."
+          });
+        }
+      }
+    }
+
+    // ── Create SOS Document ──
     const sos = await SOS.create({
       studentId,
       location: { type: "Point", coordinates: [longitude, latitude] },
       status: "active",
     });
 
-    // Notify ALL Security Guards via real-time and DB notification
-    const guards = await User.find({ role: "security" }).select("_id");
-    guards.forEach(guard => {
-      pushNotification(guard._id, {
-        type: "sos_alert",
-        title: "🚨 URGENT: SOS ALERT",
-        message: `${req.user.name} needs help! Location tracked.`,
-        link: "/security/dashboard"
+    // ── Step 7: Find Nearest Available Security Guard ──
+    let nearestGuard = null;
+    try {
+      nearestGuard = await User.findOne({
+        role: "security",
+        dutyStatus: { $in: ["available", "busy"] },
+        "lastLocation.coordinates": { $exists: true, $ne: [] },
+        "lastLocation.type": "Point",
+      }).near("lastLocation", {
+        center: { type: "Point", coordinates: [longitude, latitude] },
+        maxDistance: 5000, // 5km radius
+        spherical: true,
       });
-    });
+    } catch (geoErr) {
+      // Fallback: if geospatial query fails (e.g. no guard has location set),
+      // we still continue — all guards will be notified below
+      console.warn("[SOS] Nearest guard query failed, falling back to broadcast:", geoErr.message);
+    }
 
-    // Broadcast to SOS namespace for live map updates (Security Pool)
-    getIO().of("/sos").to("security:pool").emit("sos_alert", {
+    // Auto-assign to nearest guard if found
+    if (nearestGuard) {
+      sos.assignedSecurityId = nearestGuard._id;
+      sos.status = "assigned";
+      sos.assignedAt = new Date();
+      await sos.save();
+    }
+
+    // ── Step 8: Real-time Broadcast ──
+    const alertPayload = {
       sosId: sos._id,
       studentName: req.user.name,
       studentPhone: req.user.phone || "N/A",
       location: sos.location,
-      timestamp: sos.createdAt
-    });
+      timestamp: sos.createdAt,
+      assignedGuardId: nearestGuard?._id || null,
+    };
 
-    res.status(201).json({ success: true, data: { sosId: sos._id, status: sos.status } });
+    // Broadcast to ALL guards in security pool (so any available guard can respond)
+    getIO().of("/sos").to("security:pool").emit("sos_alert", alertPayload);
+
+    // Also send a targeted "assigned to you" event to the nearest guard specifically
+    if (nearestGuard) {
+      getIO().of("/sos").to(`user:${nearestGuard._id}`).emit("sos_assigned_to_you", {
+        ...alertPayload,
+        message: `You are the nearest guard. Please respond immediately.`,
+      });
+
+      // Notify the nearest guard via persistent notification too
+      pushNotification(nearestGuard._id, {
+        type: "sos_alert",
+        title: "🚨 URGENT: SOS — You are nearest!",
+        message: `${req.user.name} needs help! You are the closest guard. Move immediately.`,
+        link: "/security/dashboard"
+      });
+    } else {
+      // No guard with known location — notify all guards via DB notification
+      const guards = await User.find({ role: "security" }).select("_id");
+      guards.forEach(guard => {
+        pushNotification(guard._id, {
+          type: "sos_alert",
+          title: "🚨 URGENT: SOS ALERT",
+          message: `${req.user.name} needs help! Location tracked.`,
+          link: "/security/dashboard"
+        });
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      data: {
+        sosId: sos._id,
+        status: sos.status,
+        assignedGuard: nearestGuard
+          ? { name: nearestGuard.name, phone: nearestGuard.phone || "N/A" }
+          : null,
+      }
+    });
   } catch (err) {
     next(err);
   }
 };
+
 
 /**
  * @desc Cancel SOS Alert
@@ -72,12 +158,16 @@ exports.cancelSOS = async (req, res, next) => {
     sos.cancelledAt = new Date();
     await sos.save();
 
-    // Notify connected clients in SOS room
+    const cancelPayload = { sosId: sos._id, status: "cancelled" };
+
+    // Notify the specific SOS room (student + assigned security)
     getIO().of("/sos").to(`sos:${sos._id}`).emit("sos_status_update", {
-      sosId: sos._id,
-      status: "cancelled",
+      ...cancelPayload,
       message: "SOS has been cancelled by the student."
     });
+
+    // Bug #2 Fix: Also emit "sos_cancelled" so security dashboard listener fires correctly
+    getIO().of("/sos").to("security:pool").emit("sos_cancelled", cancelPayload);
 
     res.json({ success: true, message: "SOS cancelled successfully." });
   } catch (err) {
@@ -109,12 +199,18 @@ exports.acceptSOS = async (req, res, next) => {
       link: "/student/sos"
     });
 
-    // Real-time update for the specific SOS room
+    // Real-time update for the specific SOS room (student + accepting guard)
     getIO().of("/sos").to(`sos:${sos._id}`).emit("sos_status_update", {
       sosId: sos._id,
       status: "assigned",
       securityName: req.user.name,
       securityId: req.user._id
+    });
+
+    // "Already handled" — dismiss alert for ALL other guards in security pool
+    getIO().of("/sos").to("security:pool").emit("sos_accepted", {
+      sosId: sos._id,
+      acceptedBy: req.user.name,
     });
 
     res.json({ success: true, message: "SOS accepted. Move to location immediately." });

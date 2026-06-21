@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // CORS: Restrict to frontend origin
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: [process.env.FRONTEND_URL, 'http://localhost:3000', 'http://localhost:3001'].filter(Boolean),
     credentials: true
 }));
 
@@ -64,6 +64,12 @@ const startServer = async () => {
         
         const { initArchiveJob } = require('./src/jobs/lostitem.archive');
         initArchiveJob();
+        
+        const { initExpiryJob } = require('./src/jobs/marketplace.expiry');
+        initExpiryJob();
+
+        const { initNoResponseJob } = require('./src/jobs/chat.noresponse');
+        initNoResponseJob();
 
         // ── 5. Monitoring & Routes ──
         const { authenticate } = require('./src/middleware/auth.middleware');
@@ -75,6 +81,7 @@ const startServer = async () => {
         // Register Routes
         app.use('/api/auth', authRoutes);
         app.use('/api/admin', require('./src/modules/admin/admin.routes'));
+        app.use('/api/teachers', require('./src/modules/teacher/teacher.routes'));
         app.use('/api/students', require('./src/modules/student/student.routes'));
         app.use('/api/sos', require('./src/modules/sos/sos.routes'));
         app.use('/api/security', require('./src/modules/security/security.routes'));
@@ -87,7 +94,12 @@ const startServer = async () => {
 
         // Error Handler
         app.use((err, req, res, next) => {
-            logger.error(err.stack);
+            logger.error(err.stack || err.message || err);
+            
+            if (err.name === 'MulterError' && err.code === 'LIMIT_FILE_SIZE') {
+                return res.status(400).json({ success: false, error: "File too large. Maximum size is 5MB per image." });
+            }
+            
             res.status(err.status || 500).json({
                 success: false,
                 error: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message

@@ -126,16 +126,15 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Buttons */}
               <div className="flex gap-2 mt-auto">
                 {role.buttons.map((btn) => (
                   <Link key={btn.label} href={btn.href}
-                    className={`flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-semibold transition-all duration-200 group/btn ${
-                      btn.primary ? 'hover:shadow-lg' : ''
+                    className={`flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-semibold transition-all duration-300 group/btn cursor-pointer hover:shadow-lg ${
+                      btn.primary ? 'hover:brightness-110' : 'hover:opacity-80'
                     }`}
                     style={btn.primary
-                      ? { background: role.color, color: '#131314', boxShadow: `0 2px 8px ${role.color}25` }
-                      : { background: 'transparent', color: role.color, border: `1px solid ${role.color}30` }
+                      ? { background: role.color, color: '#131314', boxShadow: `0 2px 8px ${role.color}40` }
+                      : { background: '#282a2c', color: '#e8eaed', border: '1px solid #3c4043' }
                     }>
                     {btn.label}
                     {btn.primary && <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5" />}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -99,6 +100,29 @@ export default function ProfilePage({ role, apiEndpoint, editableFields = [] }) 
     );
   }
 
+  if (!profile) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#282a2c] text-[#f28b82]">
+            <X className="w-6 h-6" />
+          </div>
+          <p className="text-[#e8eaed] font-medium">Failed to load profile data</p>
+          <p className="text-[12px] text-[#9aa0a6] max-w-xs">There was an issue fetching your profile information. This usually happens if your session has expired.</p>
+          <div className="flex gap-2 mt-2">
+            <button onClick={() => window.location.reload()} className="px-4 py-2 rounded-xl text-[12px] font-medium bg-[#1e1f20] border border-[#3c4043] text-[#e8eaed] hover:bg-[#282a2c] transition-colors">
+              Retry
+            </button>
+            <button onClick={handleLogout} className="px-4 py-2 rounded-xl text-[12px] font-medium transition-all duration-300 cursor-pointer hover:opacity-80"
+              style={{ background: accent, color: '#131314' }}>
+              Log out
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="max-w-4xl mx-auto pb-8">
 
@@ -132,7 +156,13 @@ export default function ProfilePage({ role, apiEndpoint, editableFields = [] }) 
               <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-2xl ring-4 ring-[#1e1f20] relative"
                 style={{ background: '#282a2c' }}>
                 {previewImage ? (
-                  <Image src={previewImage} alt="Profile" fill className="object-cover" />
+                  <Image 
+                    src={previewImage} 
+                    alt="Profile" 
+                    fill 
+                    sizes="96px"
+                    className="object-cover" 
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-3xl font-bold" style={{ color: accent, background: `${accent}15` }}>
                     {initial}
@@ -413,8 +443,8 @@ export default function ProfilePage({ role, apiEndpoint, editableFields = [] }) 
                 <p className="text-[12px] text-[#9aa0a6] mb-4">Logging out will clear your session data. You will need to enter your credentials again to access the platform.</p>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} onClick={handleLogout}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[12px] font-semibold transition-all"
-                    style={{ background: '#f28b82', color: '#131314' }}>
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[12px] font-semibold transition-all duration-300 cursor-pointer hover:opacity-80"
+                    style={{ background: accent, color: '#131314' }}>
                     <LogOut className="w-3.5 h-3.5" /> Logout from this device
                   </motion.button>
                 </div>

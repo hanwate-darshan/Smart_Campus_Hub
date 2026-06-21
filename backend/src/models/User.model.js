@@ -80,6 +80,10 @@ const userSchema = new mongoose.Schema(
         type: [Number],
       },
     },
+    lastActiveAt: {
+      type: Date,
+      default: Date.now,
+    },
     createdByAdmin: {
       type: Boolean,
       default: false,
@@ -91,8 +95,6 @@ const userSchema = new mongoose.Schema(
 // 2dsphere index for geospatial queries on lastLocation
 userSchema.index({ lastLocation: "2dsphere" });
 
-// Unique index on email (also declared via unique: true above, explicit for clarity)
-userSchema.index({ email: 1 }, { unique: true });
 
 // Automatically strip passwordHash from JSON output
 userSchema.methods.toJSON = function () {

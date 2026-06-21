@@ -6,8 +6,10 @@ const {
   getListingDetails, 
   updateListingStatus, 
   markAsSold, 
-  reportListing 
+  reportListing,
+  checkDuplicateListing
 } = require("./listing.controller");
+const { validateCreateListing } = require("./listing.validator");
 const { authenticate } = require("../../middleware/auth.middleware");
 const { requireRole } = require("../../middleware/role.middleware");
 
@@ -24,9 +26,10 @@ const { cacheMiddleware } = require("../../utils/cache");
 router.use(authenticate);
 
 // Student Routes
-router.post("/", requireRole("student"), upload.array("images", 3), createListing);
-router.get("/", requireRole("student"), cacheMiddleware, getListings);
-router.get("/:id", requireRole("student"), getListingDetails);
+router.post("/check-duplicate", requireRole("student"), checkDuplicateListing);
+router.post("/", requireRole("student"), upload.array("images", 3), validateCreateListing, createListing);
+router.get("/", requireRole("student", "admin"), cacheMiddleware, getListings);
+router.get("/:id", requireRole("student", "admin"), getListingDetails);
 router.patch("/:id/sold", requireRole("student"), markAsSold);
 router.post("/:id/report", requireRole("student"), reportListing);
 

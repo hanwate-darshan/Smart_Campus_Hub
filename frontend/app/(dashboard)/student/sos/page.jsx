@@ -37,6 +37,8 @@ export default function StudentSOSPage() {
   const timerIntervalRef = useRef(null);
   const pressTimerRef = useRef(null);
   const locationUpdateIntervalRef = useRef(null);
+  // Bug #3 Fix: Mirror activeSOS in a ref so socket callbacks read the latest value
+  const activeSOSRef = useRef(null);
 
   // 1. CLEANUP ON UNMOUNT
   useEffect(() => {
@@ -49,40 +51,47 @@ export default function StudentSOSPage() {
     };
   }, []);
 
-  // 2. SOCKET INITIALIZATION (When SOS is active)
+  // Keep activeSOS ref in sync
+  useEffect(() => {
+    activeSOSRef.current = activeSOS;
+  }, [activeSOS]);
+
+  // 2. SOCKET INITIALIZATION (When SOS becomes active) — runs once per session
   useEffect(() => {
     if (sosStatus === "active" && !socketRef.current) {
       const token = localStorage.getItem("accessToken");
-      socketRef.current = io(SOS_NAMESPACE, {
-        auth: { token }
-      });
+      socketRef.current = io(SOS_NAMESPACE, { auth: { token } });
 
       socketRef.current.on("connect", () => {
         console.log("[SOS Socket] Connected");
-        if (activeSOS) {
-          socketRef.current.emit("join", `sos:${activeSOS._id}`);
+        // Bug #3 Fix: Read from ref — activeSOS state may not be set yet at this point
+        if (activeSOSRef.current?._id) {
+          socketRef.current.emit("join", `sos:${activeSOSRef.current._id}`);
         }
       });
 
       socketRef.current.on("sos_status_update", (payload) => {
-        if (payload.status === "resolved") {
+        if (payload.status === "resolved" || payload.status === "cancelled") {
           handleResolution();
         } else {
           setActiveSOS(prev => ({ ...prev, ...payload }));
         }
       });
 
-      socketRef.current.on("sos_cancelled", () => {
-        toast.error("Emergency session has been closed.");
-        setSosStatus("inactive");
-        stopTracking();
-      });
-
       socketRef.current.on("connect_error", (err) => {
         console.error("[SOS Socket] Auth Error", err.message);
       });
     }
-  }, [sosStatus, activeSOS]);
+  }, [sosStatus]);
+
+  // Bug #3 Fix: Dedicated effect — once activeSOS._id is available AND socket is connected,
+  // join the SOS-specific room. Handles the race condition where activeSOS is set
+  // slightly after the socket's connect event fires.
+  useEffect(() => {
+    if (activeSOS?._id && socketRef.current?.connected) {
+      socketRef.current.emit("join", `sos:${activeSOS._id}`);
+    }
+  }, [activeSOS?._id]);
 
   // 3. TRACKING & UPDATING
   const startTracking = () => {
@@ -170,13 +179,27 @@ export default function StudentSOSPage() {
       });
 
       if (data.success) {
-        setActiveSOS(data.data);
+        // Normalize backend response → shape the UI expects
+        const normalized = {
+          _id: data.data.sosId,
+          status: data.data.status,
+          securityName: data.data.assignedGuard?.name || null,
+          securityPhone: data.data.assignedGuard?.phone || null,
+        };
+        setActiveSOS(normalized);
         setSosStatus("active");
         setElapsedTime(0);
         timerIntervalRef.current = setInterval(() => {
           setElapsedTime(prev => prev + 1);
         }, 1000);
         startTracking();
+
+        // Show reassuring toast if a guard was auto-assigned immediately
+        if (data.data.assignedGuard) {
+          toast.success(`🚨 ${data.data.assignedGuard.name} (nearest guard) has been notified!`);
+        } else {
+          toast.success("SOS triggered — alerting all security guards!");
+        }
       }
     } catch (err) {
       toast.error(err.response?.data?.error || "Failed to trigger SOS");

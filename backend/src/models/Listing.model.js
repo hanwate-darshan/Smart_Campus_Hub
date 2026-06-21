@@ -43,6 +43,11 @@ const listingSchema = new mongoose.Schema(
         message: "{VALUE} is not a valid category",
       },
     },
+    condition: {
+      type: String,
+      required: false,
+      enum: ["new", "like_new", "used", "heavily_used"]
+    },
     status: {
       type: String,
       enum: ["pending", "approved", "sold", "expired", "rejected"],
@@ -51,6 +56,15 @@ const listingSchema = new mongoose.Schema(
     reportCount: {
       type: Number,
       default: 0,
+    },
+    reportedBy: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: []
+    }],
+    interestedCount: {
+      type: Number,
+      default: 0
     },
     rejectionReason: {
       type: String,

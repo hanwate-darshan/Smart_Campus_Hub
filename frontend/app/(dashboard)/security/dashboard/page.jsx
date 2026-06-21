@@ -34,13 +34,25 @@ export default function SecurityDashboardPage() {
   const [activeSOS, setActiveSOS] = useState(null);
   const [guardLocation, setGuardLocation] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
-  
+
+  // Bug #1 Fix: Mirror state in refs so socket callbacks always read fresh values
+  // without causing the socket to reconnect on every state change.
+  const dutyStatusRef = useRef(dutyStatus);
+  const activeSOSRef = useRef(activeSOS);
+  const isMutedRef = useRef(isMuted);
+  const alertSOSRef = useRef(alertSOS);
+
+  useEffect(() => { dutyStatusRef.current = dutyStatus; }, [dutyStatus]);
+  useEffect(() => { activeSOSRef.current = activeSOS; }, [activeSOS]);
+  useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
+  useEffect(() => { alertSOSRef.current = alertSOS; }, [alertSOS]);
+
   // Refs
   const socketRef = useRef(null);
   const audioRef = useRef(null);
   const watchIdRef = useRef(null);
 
-  // 1. INITIALIZATION: Socket & Audio
+  // 1. INITIALIZATION: Socket & Audio — runs ONCE on mount only
   useEffect(() => {
     // Initialize Audio
     audioRef.current = new Audio(SIREN_URL);
@@ -57,14 +69,13 @@ export default function SecurityDashboardPage() {
       socketRef.current.emit("join", "security:pool");
     });
 
-    // Listen for new SOS alerts
+    // Listen for new SOS alerts — read from refs to avoid stale closure
     socketRef.current.on("sos_alert", (payload) => {
-      // Only show alert if guard is available/busy and not already on an SOS
-      if (dutyStatus !== "offline" && !activeSOS) {
+      if (dutyStatusRef.current !== "offline" && !activeSOSRef.current) {
         setAlertSOS(payload);
-        if (!isMuted) audioRef.current.play().catch(e => console.log("Audio play blocked"));
-        
-        // Browser Notification
+        if (!isMutedRef.current) {
+          audioRef.current.play().catch(e => console.log("Audio play blocked"));
+        }
         if (Notification.permission === "granted") {
           new Notification("🚨 SOS EMERGENCY", {
             body: `${payload.studentName} needs help!`,
@@ -74,24 +85,53 @@ export default function SecurityDashboardPage() {
       }
     });
 
-    // Listen for location updates
-    socketRef.current.on("sos_location_update", (payload) => {
-      if (activeSOS && activeSOS.sosId === payload.sosId) {
-        setActiveSOS(prev => ({ ...prev, location: { ...prev.location, coordinates: payload.coordinates } }));
+    // Listen for targeted assignment — this guard is the nearest one
+    socketRef.current.on("sos_assigned_to_you", (payload) => {
+      if (dutyStatusRef.current !== "offline" && !activeSOSRef.current) {
+        // Mark as priority so the modal can show a distinct "YOU ARE ASSIGNED" badge
+        setAlertSOS({ ...payload, isPriority: true });
+        if (!isMutedRef.current) {
+          audioRef.current.play().catch(e => console.log("Audio play blocked"));
+        }
+        if (Notification.permission === "granted") {
+          new Notification("🚨 SOS — YOU ARE THE NEAREST GUARD", {
+            body: `${payload.studentName} needs your help immediately!`,
+            icon: "/favicon.ico"
+          });
+        }
       }
     });
 
-    // Listen for cancellation
+    // Listen for student location updates — read activeSOS from ref
+    socketRef.current.on("sos_location_update", (payload) => {
+      if (activeSOSRef.current && activeSOSRef.current.sosId === payload.sosId) {
+        setActiveSOS(prev => ({
+          ...prev,
+          location: { ...prev.location, coordinates: payload.coordinates }
+        }));
+      }
+    });
+
+    // Listen for cancellation — Bug #2 backend now emits "sos_cancelled" correctly
     socketRef.current.on("sos_cancelled", (payload) => {
-      if (alertSOS && alertSOS.sosId === payload.sosId) {
+      if (alertSOSRef.current && alertSOSRef.current.sosId === payload.sosId) {
         setAlertSOS(null);
         audioRef.current.pause();
         toast.error("SOS was cancelled by student");
       }
-      if (activeSOS && activeSOS.sosId === payload.sosId) {
+      if (activeSOSRef.current && activeSOSRef.current.sosId === payload.sosId) {
         setActiveSOS(null);
         setDutyStatus("available");
         toast.error("Active SOS was cancelled by student");
+      }
+    });
+
+    // "Already handled" — another guard accepted, close this guard's alert
+    socketRef.current.on("sos_accepted", (payload) => {
+      if (alertSOSRef.current && alertSOSRef.current.sosId === payload.sosId) {
+        setAlertSOS(null);
+        audioRef.current.pause();
+        toast(`✅ Already handled by ${payload.acceptedBy}`, { icon: "🛡️" });
       }
     });
 
@@ -108,7 +148,7 @@ export default function SecurityDashboardPage() {
       if (audioRef.current) audioRef.current.pause();
       if (watchIdRef.current) navigator.geolocation.clearWatch(watchIdRef.current);
     };
-  }, [dutyStatus, activeSOS, isMuted, alertSOS]);
+  }, []); // ← Empty deps: socket initializes once, refs keep values fresh
 
   const startGuardTracking = () => {
     if (navigator.geolocation) {
@@ -298,29 +338,35 @@ export default function SecurityDashboardPage() {
 
       {/* --- FULL SCREEN ALERT MODAL --- */}
       {alertSOS && (
-        <div className="fixed inset-0 z-[200] bg-red-600 p-6 flex items-center justify-center animate-in zoom-in duration-300">
-           <div className="max-w-2xl w-full bg-white dark:bg-slate-900 rounded-[3rem] p-8 md:p-12 shadow-[0_0_100px_rgba(255,0,0,0.5)] text-center relative overflow-hidden">
-              {/* Animated Background Pulse */}
-              <div className="absolute inset-0 bg-red-500/5 animate-pulse" />
+        <div className={`fixed inset-0 z-[200] p-6 flex items-center justify-center animate-in zoom-in duration-300 ${alertSOS.isPriority ? "bg-amber-500" : "bg-red-600"}`}>
+           <div className={`max-w-2xl w-full bg-white dark:bg-slate-900 rounded-[3rem] p-8 md:p-12 text-center relative overflow-hidden ${alertSOS.isPriority ? "shadow-[0_0_100px_rgba(245,158,11,0.6)]" : "shadow-[0_0_100px_rgba(255,0,0,0.5)]"}`}>
+              <div className={`absolute inset-0 animate-pulse ${alertSOS.isPriority ? "bg-amber-500/5" : "bg-red-500/5"}`} />
 
               <div className="relative z-10">
-                <div className="w-24 h-24 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
+                {/* Priority badge — only shown for nearest-guard assignment */}
+                {alertSOS.isPriority && (
+                  <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 font-black text-sm px-4 py-2 rounded-full mb-6 border-2 border-amber-300 animate-pulse">
+                    <Navigation className="w-4 h-4" /> YOU ARE THE ASSIGNED GUARD
+                  </div>
+                )}
+
+                <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce ${alertSOS.isPriority ? "bg-amber-100 text-amber-600" : "bg-red-100 text-red-600"}`}>
                   <ShieldAlert className="w-12 h-12" />
                 </div>
 
                 <h2 className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white mb-2 uppercase tracking-tighter">
-                  New SOS Emergency!
+                  {alertSOS.isPriority ? "Respond Immediately!" : "New SOS Emergency!"}
                 </h2>
-                <div className="h-1 w-20 bg-red-600 mx-auto mb-8 rounded-full" />
+                <div className={`h-1 w-20 mx-auto mb-8 rounded-full ${alertSOS.isPriority ? "bg-amber-500" : "bg-red-600"}`} />
 
                 <div className="space-y-6 mb-12">
                    <div className="flex items-center justify-center gap-4 text-2xl font-bold text-slate-700 dark:text-slate-200">
-                      <User className="text-red-600" /> {alertSOS.studentName}
+                      <User className={alertSOS.isPriority ? "text-amber-600" : "text-red-600"} /> {alertSOS.studentName}
                    </div>
                    <div className="flex items-center justify-center gap-4 text-xl text-slate-500">
-                      <MapPin className="text-red-600" /> Campus Hub Vicinity
+                      <MapPin className={alertSOS.isPriority ? "text-amber-600" : "text-red-600"} /> Campus Hub Vicinity
                    </div>
-                   <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-2xl text-red-700 dark:text-red-400 font-bold">
+                   <div className={`p-4 rounded-2xl font-bold ${alertSOS.isPriority ? "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400" : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"}`}>
                      Triggered {new Date(alertSOS.timestamp).toLocaleTimeString()}
                    </div>
                 </div>
@@ -328,7 +374,7 @@ export default function SecurityDashboardPage() {
                 <div className="flex flex-col md:flex-row gap-4">
                    <button
                     onClick={acceptSOS}
-                    className="flex-1 py-6 rounded-[2rem] bg-red-600 hover:bg-red-700 text-white font-black text-2xl shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className={`flex-1 py-6 rounded-[2rem] text-white font-black text-2xl shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-3 ${alertSOS.isPriority ? "bg-amber-500 hover:bg-amber-600" : "bg-red-600 hover:bg-red-700"}`}
                    >
                      ACCEPT SOS <Navigation className="animate-pulse" />
                    </button>

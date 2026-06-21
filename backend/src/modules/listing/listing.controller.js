@@ -9,7 +9,7 @@ const { setMarketplaceCache, invalidateMarketplaceCache } = require("../../utils
 exports.createListing = async (req, res, next) => {
   try {
     // ... (existing logic)
-    const { title, description, price, category } = req.body;
+    const { title, description, price, category, condition } = req.body;
     const sellerId = req.user._id;
 
     if (!req.files || req.files.length < 1) return res.status(400).json({ success: false, error: "At least one image is required" });
@@ -27,6 +27,7 @@ exports.createListing = async (req, res, next) => {
       description,
       price,
       category,
+      condition,
       images: imageUrls,
       status: "pending"
     });
@@ -44,21 +45,106 @@ exports.createListing = async (req, res, next) => {
 
     res.status(201).json({ success: true, data: listing });
   } catch (err) {
+    require('fs').appendFileSync('listing_error.txt', new Date().toISOString() + ': ' + (err.stack || err) + '\n');
     next(err);
   }
 };
 
-// Route 2: Get All Approved Listings (Cached)
+// Route: Check Duplicate Listing
+exports.checkDuplicateListing = async (req, res, next) => {
+  try {
+    const { title } = req.body;
+    const sellerId = req.user._id;
+
+    if (!title) return res.status(400).json({ success: false, error: "Title is required" });
+
+    const existingListings = await Listing.find({
+      sellerId: sellerId,
+      status: { $in: ["pending", "approved"] }
+    });
+
+    const newWords = title.toLowerCase().split(/\s+/).filter(w => w.length > 0);
+    let duplicateFound = null;
+
+    for (const listing of existingListings) {
+      const existingWords = listing.title.toLowerCase().split(/\s+/).filter(w => w.length > 0);
+      let matchCount = 0;
+      
+      // Count how many words match
+      newWords.forEach(word => {
+        if (existingWords.includes(word)) {
+          matchCount++;
+        }
+      });
+      
+      const matchPercentage = matchCount / newWords.length;
+      
+      if (matchPercentage > 0.6) {
+        duplicateFound = listing.title;
+        break;
+      }
+    }
+
+    if (duplicateFound) {
+      return res.status(200).json({ 
+        success: true, 
+        data: {
+          isDuplicate: true, 
+          similarListing: duplicateFound
+        },
+        message: `You already have a similar listing: '${duplicateFound}'. Are you sure you want to post this?` 
+      });
+    }
+
+    return res.status(200).json({ success: true, data: { isDuplicate: false, similarListing: null } });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route 2: Get All Approved Listings (Cached if no filters)
 exports.getListings = async (req, res, next) => {
   try {
-    const listings = await Listing.find({ status: "approved" })
+    const { category, search, minPrice, maxPrice, myListings, status } = req.query;
+    
+    let filter = {};
+
+    // Admin can query any status directly
+    if (req.user.role === "admin") {
+      if (status) filter.status = status;
+      // else admin gets all listings without status restriction
+    } else if (myListings === "true") {
+      // Student viewing their own listings
+      filter.sellerId = req.user._id;
+    } else {
+      // Student browsing: only approved
+      filter.status = "approved";
+    }
+
+    // Apply Filters
+    if (category) filter.category = category;
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+
+    const listings = await Listing.find(filter)
       .sort({ createdAt: -1 })
       .populate("sellerId", "name");
     
     const response = { success: true, count: listings.length, data: listings };
     
-    // Set Cache for next time
-    await setMarketplaceCache(response);
+    // Only cache the default "all listings" view
+    if (Object.keys(req.query).length === 0) {
+      await setMarketplaceCache(response);
+    }
     
     res.json(response);
   } catch (err) {
@@ -82,14 +168,16 @@ exports.getListingDetails = async (req, res, next) => {
 exports.updateListingStatus = async (req, res, next) => {
   try {
     const { status, reason } = req.body;
+
     const listing = await Listing.findById(req.params.id);
     if (!listing) return res.status(404).json({ success: false, error: "Listing not found" });
+    if (listing.status === "sold") return res.status(400).json({ success: false, error: "Cannot change status of a sold listing" });
 
-    if (listing.status !== "pending") return res.status(400).json({ success: false, error: "Can only moderate pending listings" });
+    const updateData = { status };
+    if (reason) updateData.rejectionReason = reason;
 
-    listing.status = status;
-    if (reason) listing.rejectionReason = reason;
-    await listing.save();
+    // Use findByIdAndUpdate to bypass Mongoose validators (avoids issues with legacy listings missing optional fields)
+    await Listing.findByIdAndUpdate(req.params.id, updateData, { runValidators: false });
 
     // Invalidate Cache since status changed
     await invalidateMarketplaceCache();
@@ -98,8 +186,8 @@ exports.updateListingStatus = async (req, res, next) => {
     pushNotification(listing.sellerId, {
       type: status === "approved" ? "listing_approved" : "listing_rejected",
       title: status === "approved" ? "Item Approved! ✅" : "Item Rejected ❌",
-      message: status === "approved" 
-        ? `Your listing "${listing.title}" is now live!` 
+      message: status === "approved"
+        ? `Your listing "${listing.title}" is now live!`
         : `Your listing "${listing.title}" was rejected. Reason: ${reason}`,
       link: "/student/marketplace"
     });
@@ -125,6 +213,20 @@ exports.markAsSold = async (req, res, next) => {
     // Lock all related chat rooms
     await ChatRoom.updateMany({ listingId: listing._id }, { isLocked: true });
 
+    // Notify all OTHER buyers who had chat rooms for this listing
+    const chatRooms = await ChatRoom.find({ listingId: listing._id });
+    for (const room of chatRooms) {
+      const buyerId = room.participants.find(p => p.toString() !== req.user._id.toString());
+      if (buyerId) {
+        pushNotification(buyerId, {
+          type: "listing_sold",
+          title: "Item No Longer Available",
+          message: 'The item "' + listing.title + '" has been sold to someone else.',
+          link: "/student/marketplace"
+        });
+      }
+    }
+
     res.json({ success: true, message: "Item marked as sold and chats locked." });
   } catch (err) {
     next(err);
@@ -134,30 +236,73 @@ exports.markAsSold = async (req, res, next) => {
 // Route 7: Report Listing
 exports.reportListing = async (req, res, next) => {
   try {
-    const listing = await Listing.findByIdAndUpdate(
-      req.params.id, 
-      { $inc: { reportCount: 1 } },
-      { new: true }
-    );
+    // Step 1: Find listing
+    const listing = await Listing.findById(req.params.id);
     if (!listing) return res.status(404).json({ success: false, error: "Listing not found" });
 
+    // Step 2: Check if already reported
+    if (listing.reportedBy.includes(req.user._id)) {
+      return res.status(400).json({ success: false, message: "You have already reported this listing." });
+    }
+
+    // Step 3: Add reporter and increment count
+    listing.reportedBy.push(req.user._id);
+    listing.reportCount += 1;
+    await listing.save();
+
+    // Step 4: Notify admins if high reports on single item
     if (listing.reportCount >= 5) {
-      // Invalidate cache if high reports (might want to hide it automatically)
-      // await invalidateMarketplaceCache();
-      
       const User = require("../../models/User.model");
       const admins = await User.find({ role: "admin" }).select("_id");
       admins.forEach(admin => {
         pushNotification(admin._id, {
-          type: "urgent_listing_report",
-          title: "Urgent: High Reports!",
-          message: `The item "${listing.title}" has received multiple reports.`,
+          type: "listing_flagged",
+          title: "Listing Flagged Multiple Times",
+          message: `"${listing.title}" has been reported ${listing.reportCount} times.`,
           link: "/admin/marketplace"
         });
       });
     }
 
-    res.json({ success: true, message: "Listing reported. Administrators will review." });
+    // Step 5: NEW LOGIC - Check seller-wide reports
+    // Find all listings by this seller where reportedBy array length >= 3
+    const flaggedListingsCount = await Listing.countDocuments({
+      sellerId: listing.sellerId,
+      'reportedBy.2': { $exists: true } // Checks if array has at least 3 elements
+    });
+
+    if (flaggedListingsCount >= 2) {
+      const User = require("../../models/User.model");
+      const seller = await User.findById(listing.sellerId);
+      
+      if (seller && seller.status !== "suspended") {
+        seller.status = "suspended";
+        await seller.save();
+
+        const { redisClient } = require('../../config/redis');
+        await redisClient.del(`refresh:${seller._id}`);
+
+        pushNotification(seller._id, {
+          type: "account_suspended",
+          title: "Account Suspended",
+          message: "Your account has been suspended due to multiple reports across your listings. Contact administration.",
+          link: "/"
+        });
+
+        const admins = await User.find({ role: "admin" }).select("_id");
+        admins.forEach(admin => {
+          pushNotification(admin._id, {
+            type: "auto_suspension",
+            title: "Seller Auto-Suspended",
+            message: `${seller.name} was automatically suspended due to repeated reports.`,
+            link: "/admin/users"
+          });
+        });
+      }
+    }
+
+    // Step 6: Return success
+    res.json({ success: true, message: "Listing reported. Thank you for keeping our marketplace safe." });
   } catch (err) {
     next(err);
   }

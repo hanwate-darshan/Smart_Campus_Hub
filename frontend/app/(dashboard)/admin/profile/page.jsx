@@ -66,7 +66,7 @@ export default function AdminProfilePage() {
           </div>
           
           <div className="z-10 mt-4 sm:mt-0">
-             <button onClick={handleLogout} className="px-5 py-2.5 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-[#3c1a1a] dark:text-[#f28b82] dark:hover:bg-[#5c2020] rounded-xl font-medium flex items-center gap-2 transition-colors">
+             <button onClick={handleLogout} className="px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all duration-300 cursor-pointer hover:opacity-80" style={{ background: '#c58af9', color: '#131314' }}>
                <LogOut className="w-4 h-4" /> Sign Out
              </button>
           </div>

@@ -13,13 +13,16 @@ import {
   ArrowRight,
   ShoppingCart,
   ShieldCheck,
-  ChevronLeft,
   ChevronRight as ChevronRightIcon,
-  Navigation
+  Navigation,
+  User,
+  CheckCircle,
+  Flag
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
+import useAuthStore from "@/store/auth.store";
 
 const CATEGORIES = [
   { id: "", label: "All Items", icon: "💎" },
@@ -31,8 +34,16 @@ const CATEGORIES = [
   { id: "clothing", label: "Clothing", icon: "👕" },
 ];
 
+const CONDITION_BADGES = {
+  new: { label: "New", icon: "🆕", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400" },
+  like_new: { label: "Like New", icon: "✨", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400" },
+  used: { label: "Used", icon: "📦", color: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400" },
+  heavily_used: { label: "Heavily Used", icon: "🔧", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400" }
+};
+
 export default function MarketplacePage() {
   const router = useRouter();
+  const { user } = useAuthStore();
   const [activeCategory, setActiveCategory] = useState("");
   const [search, setSearch] = useState("");
   const [minPrice, setMinPrice] = useState("");
@@ -41,6 +52,7 @@ export default function MarketplacePage() {
   const [loading, setLoading] = useState(true);
   const [selectedListing, setSelectedListing] = useState(null);
   const [currentImgIndex, setCurrentImgIndex] = useState(0);
+  const [showMyListings, setShowMyListings] = useState(false);
 
   // 1. Fetch Listings
   const fetchListings = async () => {
@@ -52,6 +64,7 @@ export default function MarketplacePage() {
           search: search || undefined,
           minPrice: minPrice || undefined,
           maxPrice: maxPrice || undefined,
+          myListings: showMyListings
         }
       });
       setListings(data.data);
@@ -65,7 +78,7 @@ export default function MarketplacePage() {
   useEffect(() => {
     const timeout = setTimeout(fetchListings, 500); // Debounce search
     return () => clearTimeout(timeout);
-  }, [activeCategory, search, minPrice, maxPrice]);
+  }, [activeCategory, search, minPrice, maxPrice, showMyListings]);
 
   // 2. Chat Handler
   const startChat = async (listingId) => {
@@ -74,6 +87,29 @@ export default function MarketplacePage() {
       router.push(`/student/marketplace/chat/${data.data._id}`);
     } catch (err) {
       toast.error(err.response?.data?.error || "Could not start chat");
+    }
+  };
+
+  // 3. Mark as Sold Handler
+  const markAsSold = async (id) => {
+    try {
+      await api.patch(`/api/listings/${id}/sold`);
+      toast.success("Item marked as sold! Chats locked.");
+      setSelectedListing(null);
+      fetchListings();
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to mark as sold");
+    }
+  };
+
+  // 4. Report Handler
+  const reportItem = async (id) => {
+    if (!window.confirm("Are you sure you want to report this listing as suspicious?")) return;
+    try {
+      await api.post(`/api/listings/${id}/report`);
+      toast.success("Listing reported to admins.");
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to report listing");
     }
   };
 
@@ -96,6 +132,16 @@ export default function MarketplacePage() {
                 className="w-full bg-slate-800 border-none rounded-2xl py-5 pl-14 pr-6 font-bold text-white focus:ring-2 focus:ring-blue-500 transition-all shadow-2xl"
               />
             </div>
+            <button 
+              onClick={() => setShowMyListings(!showMyListings)} 
+              className={`font-black px-10 py-5 rounded-2xl transition-all shadow-xl flex items-center justify-center gap-2 ${
+                showMyListings 
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20' 
+                  : 'bg-white/10 hover:bg-white/20 text-white backdrop-blur-md'
+              }`}
+            >
+              <User className="w-5 h-5" /> {showMyListings ? 'BROWSE ALL' : 'MY LISTINGS'}
+            </button>
             <button 
               onClick={() => router.push('/student/marketplace/sell')} 
               className="bg-blue-600 hover:bg-blue-700 text-white font-black px-10 py-5 rounded-2xl transition-all shadow-xl shadow-blue-500/20 flex items-center justify-center gap-2"
@@ -149,18 +195,34 @@ export default function MarketplacePage() {
               className="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 overflow-hidden group hover:shadow-2xl transition-all cursor-pointer flex flex-col"
             >
               <div className="aspect-[4/5] relative overflow-hidden">
-                <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute top-4 left-4">
+                {/* Bug fix: model uses images[] array, not image */}
+                <img src={item.images?.[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                {item.condition && CONDITION_BADGES[item.condition] && (
+                  <div className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center shadow-lg backdrop-blur-md ${CONDITION_BADGES[item.condition].color}`}>
+                    {CONDITION_BADGES[item.condition].icon}
+                  </div>
+                )}
+                <div className="absolute top-4 left-4 flex flex-col gap-2 items-start">
                   <span className="bg-white/90 backdrop-blur-md text-slate-800 text-[10px] font-black px-3 py-1 rounded-full shadow-lg">
                     {item.category.toUpperCase()}
                   </span>
+                  {showMyListings && item.status !== "approved" && (
+                    <span className={`backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg ${
+                      item.status === 'pending' ? 'bg-amber-500/90' : 
+                      item.status === 'rejected' ? 'bg-red-500/90' : 
+                      'bg-slate-500/90'
+                    }`}>
+                      {item.status.toUpperCase()}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="p-6 flex flex-col items-center text-center">
                 <h3 className="font-black text-slate-800 dark:text-white text-lg line-clamp-1">{item.title}</h3>
                 <p className="text-blue-600 font-black text-xl mt-1">₹{item.price}</p>
                 <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-3">
-                  <ShieldCheck className="w-3 h-3 text-blue-500" /> Seller: {item.sellerFirstName}
+                  {/* Bug fix: backend populates sellerId.name, not sellerFirstName */}
+                  <ShieldCheck className="w-3 h-3 text-blue-500" /> Seller: {item.sellerId?.name?.split(' ')[0]}
                 </div>
               </div>
             </div>
@@ -215,13 +277,38 @@ export default function MarketplacePage() {
                      <X className="w-8 h-8" />
                    </button>
                 </div>
-
-                <h2 className="text-4xl font-black text-slate-800 dark:text-white mt-4">{selectedListing.title}</h2>
-                <div className="flex items-center gap-4 mt-4">
-                  <span className="text-4xl font-black text-blue-600">₹{selectedListing.price}</span>
-                  <span className="text-slate-400 font-bold bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl text-xs uppercase tracking-widest">
-                    {selectedListing.category}
-                  </span>
+                
+                <div className="flex justify-between items-start mt-4">
+                  <h2 className="text-4xl font-black text-slate-800 dark:text-white">{selectedListing.title}</h2>
+                  {selectedListing.sellerId?._id !== user?._id && selectedListing.sellerId !== user?._id && (
+                    <button 
+                      onClick={() => reportItem(selectedListing._id)}
+                      className="flex items-center gap-2 text-[10px] font-black text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 px-3 py-1.5 rounded-full uppercase tracking-widest transition-colors shrink-0"
+                      title="Report suspicious listing"
+                    >
+                      <Flag className="w-3 h-3" /> Report
+                    </button>
+                  )}
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-center gap-4">
+                    <span className="text-4xl font-black text-blue-600">₹{selectedListing.price}</span>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="text-slate-400 font-bold bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl text-xs uppercase tracking-widest">
+                        {selectedListing.category}
+                      </span>
+                      {selectedListing.condition && CONDITION_BADGES[selectedListing.condition] && (
+                        <span className={`font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-widest flex items-center gap-1 ${CONDITION_BADGES[selectedListing.condition].color}`}>
+                          {CONDITION_BADGES[selectedListing.condition].icon} {CONDITION_BADGES[selectedListing.condition].label}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {selectedListing.interestedCount > 0 && (
+                    <span className="text-xs font-bold text-slate-500 flex items-center gap-1 mt-3">
+                      👥 {selectedListing.interestedCount} people interested
+                    </span>
+                  )}
                 </div>
 
                 <div className="mt-10 space-y-4">
@@ -238,17 +325,27 @@ export default function MarketplacePage() {
                        👤
                     </div>
                     <div>
-                       <h4 className="font-black text-slate-800 dark:text-white">Listed by {selectedListing.sellerFirstName}</h4>
-                       <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">Member since Oct 2023</p>
+                       <h4 className="font-black text-slate-800 dark:text-white">Listed by {selectedListing.sellerId?.name?.split(' ')[0]}</h4>
+                       <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">Verified Campus Member</p>
                     </div>
                  </div>
 
-                 <button 
-                  onClick={() => startChat(selectedListing._id)}
-                  className="w-full py-6 rounded-[2rem] bg-blue-600 hover:bg-blue-700 text-white font-black text-xl transition-all shadow-2xl shadow-blue-500/30 flex items-center justify-center gap-3 active:scale-[0.98]"
-                 >
-                   <MessageCircle className="w-7 h-7" /> CONTACT SELLER
-                 </button>
+                 {selectedListing.sellerId?._id === user?._id || selectedListing.sellerId === user?._id ? (
+                   <button 
+                     onClick={() => markAsSold(selectedListing._id)}
+                     disabled={selectedListing.status === "sold"}
+                     className="w-full py-6 rounded-[2rem] bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-black text-xl transition-all shadow-2xl shadow-emerald-500/30 flex items-center justify-center gap-3 active:scale-[0.98]"
+                   >
+                     <ShieldCheck className="w-7 h-7" /> {selectedListing.status === "sold" ? "ITEM SOLD" : "MARK AS SOLD"}
+                   </button>
+                 ) : (
+                   <button 
+                    onClick={() => startChat(selectedListing._id)}
+                    className="w-full py-6 rounded-[2rem] bg-blue-600 hover:bg-blue-700 text-white font-black text-xl transition-all shadow-2xl shadow-blue-500/30 flex items-center justify-center gap-3 active:scale-[0.98]"
+                   >
+                     <MessageCircle className="w-7 h-7" /> CONTACT SELLER
+                   </button>
+                 )}
               </div>
             </div>
           </div>

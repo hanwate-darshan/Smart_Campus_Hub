@@ -44,6 +44,10 @@ const chatRoomSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    noResponseNotifiedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

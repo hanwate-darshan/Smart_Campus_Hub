@@ -25,6 +25,13 @@ const CATEGORIES = [
   { id: "other", label: "Other" },
 ];
 
+const CONDITIONS = [
+  { id: "new", label: "New (never used)", icon: "🆕" },
+  { id: "like_new", label: "Like New (barely used)", icon: "✨" },
+  { id: "used", label: "Used (normal wear)", icon: "📦" },
+  { id: "heavily_used", label: "Heavily Used (visible wear)", icon: "🔧" }
+];
+
 export default function SellItemPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -34,18 +41,48 @@ export default function SellItemPage() {
     title: "",
     description: "",
     price: "",
-    category: "books"
+    category: "books",
+    condition: ""
   });
+  const [duplicateWarning, setDuplicateWarning] = useState("");
+
+  const handleTitleBlur = async () => {
+    if (!formData.title || formData.title.length < 3) return;
+    try {
+      const res = await api.post("/api/listings/check-duplicate", { title: formData.title });
+      if (res.data?.data?.isDuplicate) {
+        setDuplicateWarning(`⚠️ You already have a similar listing: '${res.data.data.similarListing}'. Are you sure you want to post this too?`);
+      } else {
+        setDuplicateWarning("");
+      }
+    } catch (err) {
+      console.error("Duplicate check failed", err);
+    }
+  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    if (images.length + files.length > 3) {
+    
+    // Validate files
+    const validFiles = files.filter(file => {
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not a valid image`);
+        return false;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} exceeds the 5MB size limit`);
+        return false;
+      }
+      return true;
+    });
+
+    if (images.length + validFiles.length > 3) {
       return toast.error("Maximum 3 images allowed");
     }
 
-    setImages(prev => [...prev, ...files]);
+    setImages(prev => [...prev, ...validFiles]);
     
-    const newPreviews = files.map(file => URL.createObjectURL(file));
+    const newPreviews = validFiles.map(file => URL.createObjectURL(file));
     setPreviews(prev => [...prev, ...newPreviews]);
   };
 
@@ -57,12 +94,14 @@ export default function SellItemPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (images.length === 0) return toast.error("At least one image is required");
+    if (!formData.condition) return toast.error("Please select an item condition");
 
     const data = new FormData();
     data.append("title", formData.title);
     data.append("description", formData.description);
     data.append("price", formData.price);
     data.append("category", formData.category);
+    data.append("condition", formData.condition);
     images.forEach(img => data.append("images", img));
 
     setLoading(true);
@@ -133,9 +172,16 @@ export default function SellItemPage() {
                    type="text"
                    value={formData.title}
                    onChange={e => setFormData({...formData, title: e.target.value})}
+                   onBlur={handleTitleBlur}
                    className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none focus:ring-2 focus:ring-blue-500 font-bold"
                    placeholder="e.g. Concise Physics - 10th Ed"
                  />
+                 {duplicateWarning && (
+                   <div className="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-500 text-xs font-bold rounded-xl mt-2 flex items-start gap-2">
+                     <AlertCircle className="w-4 h-4 shrink-0" />
+                     {duplicateWarning}
+                   </div>
+                 )}
               </div>
 
               <div className="space-y-2">
@@ -165,6 +211,28 @@ export default function SellItemPage() {
                    </button>
                  ))}
               </div>
+           </div>
+        </div>
+
+        {/* --- CONDITION --- */}
+        <div className="space-y-4">
+           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Item Condition</label>
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {CONDITIONS.map(cond => (
+                <button 
+                  key={cond.id}
+                  type="button"
+                  onClick={() => setFormData({...formData, condition: cond.id})}
+                  className={`p-4 flex flex-col items-center justify-center gap-2 rounded-2xl border-2 transition-all text-center ${
+                    formData.condition === cond.id 
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/40 shadow-sm' 
+                      : 'border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 bg-white dark:bg-slate-800'
+                  }`}
+                >
+                  <span className="text-2xl">{cond.icon}</span>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{cond.label}</span>
+                </button>
+              ))}
            </div>
         </div>
 

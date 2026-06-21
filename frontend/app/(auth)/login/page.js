@@ -223,10 +223,10 @@ function LoginForm() {
 
             {/* Submit */}
             <motion.button id="login-submit" type="submit" disabled={loading}
-              whileHover={{ scale: loading ? 1 : 1.01, boxShadow: `0 8px 25px ${meta.color}30` }}
+              whileHover={{ scale: loading ? 1 : 1.01, boxShadow: `0 8px 25px ${meta.color}40` }}
               whileTap={{ scale: 0.98 }}
-              className="w-full py-3 rounded-xl text-[13px] font-semibold transition-all flex items-center justify-center gap-2 mt-6 disabled:opacity-60"
-              style={{ background: meta.color, color: '#131314', boxShadow: `0 4px 14px ${meta.color}25` }}>
+              className="w-full py-3 rounded-xl text-[13px] font-semibold transition-all duration-300 flex items-center justify-center gap-2 mt-6 disabled:opacity-60 cursor-pointer"
+              style={{ background: meta.color, color: '#131314', boxShadow: `0 4px 14px ${meta.color}30` }}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
               {loading ? "Signing in..." : `Sign in as ${meta.label}`}
             </motion.button>

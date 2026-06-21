@@ -33,6 +33,18 @@ export default function ChatViewPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [otherUserTyping, setOtherUserTyping] = useState(false);
 
+  const getLastActiveStatus = (lastActiveAt) => {
+    if (!lastActiveAt) return null;
+    const diffInMs = new Date() - new Date(lastActiveAt);
+    const diffInMins = Math.floor(diffInMs / 60000);
+    const diffInHours = Math.floor(diffInMins / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+
+    if (diffInMins <= 10) return { text: "Active now", active: true };
+    if (diffInHours < 24) return { text: `Active ${diffInHours || 1} hour${diffInHours > 1 ? 's' : ''} ago`, active: false };
+    return { text: `Active ${diffInDays || 1} day${diffInDays > 1 ? 's' : ''} ago`, active: false };
+  };
+
   const socketRef = useRef(null);
   const chatEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
@@ -40,13 +52,8 @@ export default function ChatViewPage() {
   // 1. Fetch Room and Messages
   const fetchData = async () => {
     try {
-      const [roomRes, msgRes] = await Promise.all([
-        api.get(`/api/chat/rooms`), // We'll find it in the list for now or get by ID
-        api.get(`/api/chat/rooms/${roomId}/messages`)
-      ]);
-      
-      const currentRoom = roomRes.data.data.find(r => r._id === roomId);
-      setRoom(currentRoom);
+      const msgRes = await api.get(`/api/chat/rooms/${roomId}/messages`);
+      setRoom(msgRes.data.room);
       setMessages(msgRes.data.data);
     } catch (err) {
       toast.error("Failed to load chat");
@@ -152,17 +159,35 @@ export default function ChatViewPage() {
           <div>
              <h2 className="font-black text-slate-800 dark:text-white text-lg flex items-center gap-2">
                {room?.otherParticipantName}
-               <span className="w-2 h-2 rounded-full bg-emerald-500" />
+               {room?.otherParticipantLastActive && getLastActiveStatus(room.otherParticipantLastActive)?.active && (
+                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
+               )}
              </h2>
-             <p className="text-xs text-blue-600 font-bold uppercase tracking-tighter flex items-center gap-1 mt-0.5">
-               <Package className="w-3 h-3" /> Re: {room?.listingTitle}
-             </p>
+             <div className="flex items-center gap-3 mt-0.5">
+               <p className="text-xs text-blue-600 font-bold uppercase tracking-tighter flex items-center gap-1">
+                 <Package className="w-3 h-3" /> Re: {room?.listingTitle}
+               </p>
+               {room?.otherParticipantLastActive && (
+                 <p className={`text-[10px] font-bold ${getLastActiveStatus(room.otherParticipantLastActive).active ? 'text-emerald-500' : 'text-slate-400'}`}>
+                   • {getLastActiveStatus(room.otherParticipantLastActive).text}
+                 </p>
+               )}
+             </div>
           </div>
         </div>
         <button className="p-2.5 text-slate-400">
            <MoreVertical className="w-5 h-5" />
         </button>
       </header>
+
+      {/* --- SECURITY BANNER --- */}
+      <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-100 dark:border-amber-900/30 px-6 py-3 flex items-start gap-3">
+        <Info className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
+        <div>
+          <p className="text-sm font-bold text-amber-800 dark:text-amber-500">Safety First: Always meet inside the campus.</p>
+          <p className="text-xs font-medium text-amber-700/80 dark:text-amber-500/80 mt-0.5">Do not make online payments before receiving the item. Transactions are offline only.</p>
+        </div>
+      </div>
 
       {/* --- MESSAGE AREA --- */}
       <main className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-hide">

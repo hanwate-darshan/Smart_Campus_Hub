@@ -1,29 +1,9 @@
-const User = require("../../models/User.model");
-const securityService = require('./security.service');
-const { updateProfileSchema } = require('./security.validator');
-
-const updateDutyStatus = async (req, res, next) => {
-  try {
-    const { dutyStatus } = req.body;
-    if (!["available", "busy", "offline"].includes(dutyStatus)) {
-      return res.status(400).json({ success: false, error: "Invalid duty status" });
-    }
-
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { dutyStatus },
-      { new: true }
-    ).select("dutyStatus");
-
-    res.json({ success: true, data: user });
-  } catch (err) {
-    next(err);
-  }
-};
+const teacherService = require('./teacher.service');
+const { updateProfileSchema } = require('./teacher.validator');
 
 const getProfile = async (req, res) => {
   try {
-    const profile = await securityService.getProfile(req.user.id);
+    const profile = await teacherService.getProfile(req.user.id);
     res.status(200).json({ success: true, data: profile });
   } catch (err) {
     res.status(err.statusCode || 500).json({
@@ -41,7 +21,7 @@ const updateProfile = async (req, res) => {
       return res.status(400).json({ success: false, error: error.details[0].message, message: 'Validation failed' });
     }
 
-    const updatedUser = await securityService.updateProfile(req.user.id, value, req.file);
+    const updatedUser = await teacherService.updateProfile(req.user.id, value, req.file);
     res.status(200).json({ success: true, data: updatedUser, message: 'Profile updated successfully' });
   } catch (err) {
     res.status(err.statusCode || 500).json({
@@ -53,7 +33,6 @@ const updateProfile = async (req, res) => {
 };
 
 module.exports = {
-  updateDutyStatus,
   getProfile,
   updateProfile,
 };

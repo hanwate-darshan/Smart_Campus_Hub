@@ -8,7 +8,7 @@ let io = null;
 const initSocket = async (httpServer) => {
   io = new Server(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+      origin: [process.env.FRONTEND_URL, 'http://localhost:3000', 'http://localhost:3001'].filter(Boolean),
       methods: ['GET', 'POST'],
       credentials: true
     },

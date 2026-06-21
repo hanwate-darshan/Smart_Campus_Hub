@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User.model');
+const logger = require('../config/logger');
 
 const authenticate = async (req, res, next) => {
   try {
@@ -31,8 +32,11 @@ const authenticate = async (req, res, next) => {
       return res.status(403).json({ success: false, message: "Account not active" });
     }
 
-    // Step 6 & 7: Set req.user and call next
+    // Step 6 & 7: Set req.user and update lastActiveAt (fire and forget)
     req.user = user;
+    
+    User.findByIdAndUpdate(user._id, { lastActiveAt: new Date() }).catch(err => logger.error("Failed to update lastActiveAt: ", err));
+
     next();
   } catch (error) {
     return res.status(500).json({ success: false, message: "Internal server error during authentication" });

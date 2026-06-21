@@ -215,8 +215,8 @@ export default function SimpleProfilePage({ role }) {
               <div className="px-5 py-4" style={{ background: '#1e1f20' }}>
                 <p className="text-[12px] text-[#9aa0a6] mb-4">Logging out will clear your session data. You will need to enter your credentials again.</p>
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} onClick={handleLogout}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[12px] font-semibold transition-all"
-                  style={{ background: '#f28b82', color: '#131314' }}>
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[12px] font-semibold transition-all duration-300 cursor-pointer hover:opacity-80"
+                  style={{ background: accent, color: '#131314' }}>
                   <LogOut className="w-3.5 h-3.5" /> Logout from this device
                 </motion.button>
               </div>

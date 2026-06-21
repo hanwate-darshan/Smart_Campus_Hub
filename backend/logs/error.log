@@ -96,3 +96,36 @@
 [31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
 [31m    at async exports.cancelSOS (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\sos\sos.controller.js:64:17)[39m
 2026-04-17 20:07:46:746 [31merror[39m: [31mUNCAUGHT EXCEPTION! 💥 Shutting down...[39m
+2026-06-21 14:03:51:351 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:04:54:454 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:08:23:823 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m

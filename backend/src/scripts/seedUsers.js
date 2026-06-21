@@ -3,11 +3,7 @@ const mongoose = require('mongoose');
 const User = require('../models/User.model');
 const bcrypt = require('bcrypt');
 
-/**
- * 📝 INSTRUCTIONS:
- * Run this script using: node src/scripts/seedUsers.js
- * These users will then be able to log in via Google or regular login.
- */
+
 
 const usersToCreate = [
   // --- ADMINS ---
