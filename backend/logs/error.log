@@ -129,3 +129,292 @@
 [31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
 [31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
 [31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:24:42:2442 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:24:48:2448 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:25:51:2551 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:32:49:3249 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:32:54:3254 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:32:55:3255 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:32:56:3256 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:32:56:3256 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:32:56:3256 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:32:57:3257 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:32:57:3257 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:32:57:3257 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:32:57:3257 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:32:57:3257 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:32:57:3257 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:34:07:347 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:44:28:4428 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:44:30:4430 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:44:31:4431 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:44:56:4456 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 14:45:29:4529 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 16:38:33:3833 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 16:38:56:3856 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 16:39:13:3913 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 16:39:22:3922 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 16:40:06:406 [31merror[39m: [31mTypeError: Cannot set properties of undefined (setting 'status')[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\listing\listing.routes.js:38:19[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\middleware\role.middleware.js:6:5[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at next (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:157:13)[39m
+[31m    at Route.dispatch (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\route.js:117:3)[39m
+[31m    at handle (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:435:11)[39m
+[31m    at Layer.handleRequest (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\lib\layer.js:152:17)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\router\index.js:295:15[39m
+2026-06-21 16:45:25:4525 [31merror[39m: [31mUNCAUGHT EXCEPTION! 💥 Shutting down...[39m
+2026-06-21 16:46:36:4636 [31merror[39m: [31mUNCAUGHT EXCEPTION! 💥 Shutting down...[39m
+2026-06-21 16:46:57:4657 [31merror[39m: [31mUNCAUGHT EXCEPTION! 💥 Shutting down...[39m

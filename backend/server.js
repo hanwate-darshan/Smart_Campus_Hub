@@ -107,9 +107,27 @@ const startServer = async () => {
         });
 
         const PORT = process.env.PORT || 5000;
-        server.listen(PORT, () => {
-            logger.info(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-        });
+
+// Function to start listening on a given port
+const startListening = (port) => {
+    server.listen(port, () => {
+        logger.info(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${port}`);
+    });
+};
+
+// Initial attempt
+startListening(PORT);
+
+// Fallback for port conflict (EADDRINUSE)
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        const fallbackPort = Number(PORT) + 1;
+        logger.warn(`Port ${PORT} in use, switching to fallback port ${fallbackPort}`);
+        startListening(fallbackPort);
+    } else {
+        logger.error('Server error:', err);
+    }
+});
 
         // ── 6. Global Rejection Handlers ──
         process.on('unhandledRejection', (err) => {

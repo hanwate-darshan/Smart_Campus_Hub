@@ -28,7 +28,7 @@ const authenticate = async (req, res, next) => {
     }
 
     // Step 5: Check user status
-    if (user.status !== "approved") {
+    if (user.status !== "approved" && user.role !== "admin") {
       return res.status(403).json({ success: false, message: "Account not active" });
     }
 

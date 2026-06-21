@@ -35,12 +35,14 @@ router.post("/:id/report", requireRole("student"), reportListing);
 
 // Admin Routes
 router.patch("/:id/approve", requireRole("admin"), (req, res, next) => {
-  req.body.status = "approved";
+  // Ensure mutable body object
+  req.body = { ...(req.body || {}), status: "approved" };
   updateListingStatus(req, res, next);
 });
 
 router.patch("/:id/reject", requireRole("admin"), (req, res, next) => {
-  req.body.status = "rejected";
+  // Ensure mutable body object
+  req.body = { ...(req.body || {}), status: "rejected" };
   updateListingStatus(req, res, next);
 });
 
