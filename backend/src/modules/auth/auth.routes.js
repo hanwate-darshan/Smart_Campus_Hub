@@ -12,6 +12,10 @@ const upload = multer({
 
 router.post('/register', upload.single('idProof'), register);
 router.post('/login', login);
+// Forgot password endpoint – sends a reset link via email
+router.post('/forgot-password', require('./auth.controller').forgotPassword);
+// Reset password endpoint – verifies token and updates password
+router.post('/reset-password', require('./auth.controller').resetPassword);
 router.post('/google-login', googleLogin);
 router.post('/refresh', refresh);
 router.post('/logout', authenticate, logout);

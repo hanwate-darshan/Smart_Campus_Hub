@@ -80,6 +80,7 @@ export default function NotificationList() {
     try {
       await api.patch(`/api/notifications/${id}/read`);
       setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
+      window.dispatchEvent(new Event('notifications_read'));
       if (link) router.push(link);
     } catch (err) {}
   };

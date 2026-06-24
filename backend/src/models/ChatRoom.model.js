@@ -48,6 +48,10 @@ const chatRoomSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    dealReminderNotifiedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

@@ -85,7 +85,7 @@ exports.getMessages = async (req, res, next) => {
     // Verify participation and populate needed fields
     const room = await ChatRoom.findOne({ _id: roomId, participants: req.user._id })
       .populate("participants", "name lastActiveAt")
-      .populate("listingId", "title");
+      .populate("listingId", "title sellerId status");
       
     if (!room) return res.status(403).json({ success: false, error: "Access denied" });
 
@@ -93,10 +93,14 @@ exports.getMessages = async (req, res, next) => {
     const formattedRoom = {
       _id: room._id,
       type: room.type,
+      createdAt: room.createdAt,
       lastMessage: room.lastMessage,
       lastMessageAt: room.lastMessageAt,
       isLocked: room.isLocked,
+      listingId: room.listingId?._id || null,
       listingTitle: room.listingId?.title || "N/A",
+      listingSellerId: room.listingId?.sellerId || null,
+      listingStatus: room.listingId?.status || null,
       otherParticipantName: otherUser?.name || "Unknown",
       otherParticipantLastActive: otherUser?.lastActiveAt || null
     };

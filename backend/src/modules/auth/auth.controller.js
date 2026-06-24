@@ -129,10 +129,71 @@ const googleLogin = async (req, res) => {
   }
 };
 
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const emailUtils = require('../../utils/email.utils');
+
+// Forgot password – send reset link via email
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, error: 'Email is required' });
+    }
+    const user = await require('../../models/User.model').findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+    // Use a fallback secret in development if RESET_TOKEN_SECRET is not set
+const secret = process.env.RESET_TOKEN_SECRET || 'dev_reset_secret_key';
+const token = jwt.sign({ id: user._id, email: user.email }, secret, { expiresIn: process.env.RESET_TOKEN_EXPIRY || '1h' });
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const resetLink = `${frontendUrl}/reset-password?token=${token}`;
+    await emailUtils.sendMail({
+      to: user.email,
+      subject: 'Password Reset Request',
+      html: `<p>Hello ${user.name},</p><p>Click <a href="${resetLink}">here</a> to reset your password. This link expires in 1 hour.</p>`
+    });
+    return res.status(200).json({ success: true, message: 'Password reset email sent' });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    return res.status(500).json({ success: false, error: err.message || 'Server error' });
+  }
+};
+
+// Reset password – verify token and update password
+const resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) {
+      return res.status(400).json({ success: false, error: 'Token and newPassword are required' });
+    }
+    const payload = jwt.verify(token, process.env.RESET_TOKEN_SECRET);
+    const user = await require('../../models/User.model').findById(payload.id);
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(newPassword, salt);
+    user.passwordHash = hash;
+    await user.save();
+    return res.status(200).json({ success: true, message: 'Password has been reset' });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    if (err.name === 'TokenExpiredError' || err.name === 'JsonWebTokenError') {
+      return res.status(400).json({ success: false, error: 'Invalid or expired token' });
+    }
+    return res.status(500).json({ success: false, error: err.message || 'Server error' });
+  }
+};
+
 module.exports = {
   register,
   login,
   refresh,
   logout,
-  googleLogin
+  googleLogin,
+  forgotPassword,
+  resetPassword
 };
+

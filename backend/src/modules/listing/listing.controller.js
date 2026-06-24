@@ -192,6 +192,19 @@ exports.updateListingStatus = async (req, res, next) => {
       link: "/student/marketplace"
     });
 
+    // Notify ALL other students if the listing is approved
+    if (status === "approved") {
+      const students = await User.find({ role: "student", _id: { $ne: listing.sellerId } }).select("_id");
+      students.forEach(student => {
+        pushNotification(student._id, {
+          type: "marketplace_update",
+          title: "New Item in Marketplace! 🛒",
+          message: `A new item "${listing.title}" is now available for ₹${listing.price}!`,
+          link: "/student/marketplace"
+        });
+      });
+    }
+
     res.json({ success: true, message: `Listing ${status}` });
   } catch (err) {
     next(err);

@@ -418,3 +418,24 @@
 2026-06-21 16:45:25:4525 [31merror[39m: [31mUNCAUGHT EXCEPTION! 💥 Shutting down...[39m
 2026-06-21 16:46:36:4636 [31merror[39m: [31mUNCAUGHT EXCEPTION! 💥 Shutting down...[39m
 2026-06-21 16:46:57:4657 [31merror[39m: [31mUNCAUGHT EXCEPTION! 💥 Shutting down...[39m
+2026-06-24 14:22:03:223 [31merror[39m: [31mSyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)[39m
+[31m    at JSON.parse (<anonymous>)[39m
+[31m    at parse (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\body-parser\lib\types\json.js:72:19)[39m
+[31m    at C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\body-parser\lib\read.js:162:18[39m
+[31m    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)[39m
+[31m    at invokeCallback (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\raw-body\index.js:238:16)[39m
+[31m    at done (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\raw-body\index.js:227:7)[39m
+[31m    at IncomingMessage.onEnd (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\node_modules\raw-body\index.js:287:7)[39m
+[31m    at IncomingMessage.emit (node:events:518:28)[39m
+[31m    at endReadableNT (node:internal/streams/readable:1698:12)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)[39m
+2026-06-24 22:24:27:2427 [31merror[39m: [31mUNHANDLED REJECTION! 💥 Shutting down...[39m
+2026-06-24 22:24:27:2427 [31merror[39m: [31mread ECONNRESET[39m
+2026-06-24 22:24:27:2427 [31merror[39m: [31mUNHANDLED REJECTION! 💥 Shutting down...[39m
+2026-06-24 22:24:27:2427 [31merror[39m: [31m[31mread ECONNRESET[31m[39m
+2026-06-24 22:24:27:2427 [31merror[39m: [31mUNHANDLED REJECTION! 💥 Shutting down...[39m
+2026-06-24 22:24:27:2427 [31merror[39m: [31m[31m[31mread ECONNRESET[31m[31m[39m
+2026-06-24 22:24:27:2427 [31merror[39m: [31mUNHANDLED REJECTION! 💥 Shutting down...[39m
+2026-06-24 22:24:27:2427 [31merror[39m: [31m[31m[31m[31mread ECONNRESET[31m[31m[31m[39m
+2026-06-24 22:24:27:2427 [31merror[39m: [31mUNHANDLED REJECTION! 💥 Shutting down...[39m
+2026-06-24 22:24:27:2427 [31merror[39m: [31m[31m[31m[31m[31mread ECONNRESET[31m[31m[31m[31m[39m

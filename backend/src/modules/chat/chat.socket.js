@@ -66,11 +66,12 @@ const registerChatHandlers = (chatNs, socket) => {
 
       // Step 7: Emit to room
       chatNs.to(`room:${roomId}`).emit("message_new", {
-        messageId: message._id,
+        _id: message._id,
         roomId,
         senderId: userId,
         senderName: userName,
         content,
+        readBy: message.readBy,
         createdAt: message.createdAt
       });
 

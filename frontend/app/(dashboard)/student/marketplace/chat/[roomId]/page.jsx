@@ -89,7 +89,7 @@ export default function ChatViewPage() {
       if (data.roomId === roomId) {
         setMessages(prev => prev.map(m => ({
           ...m,
-          readBy: m.readBy.includes(data.readBy) ? m.readBy : [...m.readBy, data.readBy]
+          readBy: m.readBy?.includes(data.readBy) ? m.readBy : [...(m.readBy || []), data.readBy]
         })));
       }
     });
@@ -134,6 +134,31 @@ export default function ChatViewPage() {
       clearTimeout(typingTimeoutRef.current);
       setIsTyping(false);
       socketRef.current.emit("typing_stop", { roomId });
+    }
+  };
+
+  const currentUserId = user?.id || user?._id;
+  const isSeller = String(room?.listingSellerId) === String(currentUserId);
+  const showReminderBanner = room?.type === 'marketplace' && !room?.isLocked;
+  
+  console.log("Chat Banner Debug:", {
+    listingSellerId: room?.listingSellerId,
+    currentUserId,
+    isSeller,
+    type: room?.type,
+    isLocked: room?.isLocked,
+    status: room?.listingStatus,
+    showReminderBanner
+  });
+
+  const handleMarkAsSold = async () => {
+    if (!room?.listingId) return;
+    try {
+      await api.patch(`/api/listings/${room.listingId}/sold`);
+      toast.success("Listing marked as sold!");
+      setRoom(prev => ({ ...prev, isLocked: true, listingStatus: 'sold' }));
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to mark as sold");
     }
   };
 
@@ -189,10 +214,36 @@ export default function ChatViewPage() {
         </div>
       </div>
 
+      {/* --- DEAL REMINDER BANNER --- */}
+      {showReminderBanner && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/30 px-6 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <Package className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-bold text-blue-800 dark:text-blue-400">Did you complete this deal?</p>
+              <p className="text-xs font-medium text-blue-700/80 dark:text-blue-400/80 mt-0.5">
+                {isSeller 
+                  ? "If the item is handed over, please mark it as sold to close the listing."
+                  : "If you bought this item, please remind the seller to mark it as sold."}
+              </p>
+            </div>
+          </div>
+          {isSeller && (
+            <button
+              onClick={handleMarkAsSold}
+              className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors shrink-0"
+            >
+              Mark as Sold
+            </button>
+          )}
+        </div>
+      )}
+
       {/* --- MESSAGE AREA --- */}
       <main className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-hide">
         {messages.map((msg, index) => {
-          const isOwn = msg.senderId === user?._id || msg.senderId?._id === user?._id;
+          const userId = user?.id || user?._id;
+          const isOwn = msg.senderId === userId || msg.senderId?._id === userId;
           const showDate = index === 0 || new Date(messages[index-1].createdAt).toDateString() !== new Date(msg.createdAt).toDateString();
           
           return (
@@ -218,7 +269,7 @@ export default function ChatViewPage() {
                       {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                     {isOwn && (
-                      <CheckCheck className={`w-3 h-3 ${msg.readBy.length > 1 ? 'text-blue-500' : 'text-slate-300'}`} />
+                      <CheckCheck className={`w-3 h-3 ${msg.readBy?.length > 1 ? 'text-blue-500' : 'text-slate-300'}`} />
                     )}
                   </div>
                 </div>

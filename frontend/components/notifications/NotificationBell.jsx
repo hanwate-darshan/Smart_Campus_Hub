@@ -70,9 +70,11 @@ export default function NotificationBell() {
     };
 
     notificationsNs.on("notification_push", handleNewNotification);
+    window.addEventListener('notifications_read', fetchUnreadCount);
 
     return () => {
       notificationsNs.off("notification_push", handleNewNotification);
+      window.removeEventListener('notifications_read', fetchUnreadCount);
     };
   }, [user]);
 

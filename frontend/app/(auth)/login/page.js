@@ -221,7 +221,11 @@ function LoginForm() {
               </motion.div>
             </div>
 
-            {/* Submit */}
+            {/* Forgot password link */}
+<div className="text-right mt-2">
+  <Link href="/forgot-password" className="text-sm text-[#8ab4f8] hover:underline">Forgot password?</Link>
+</div>
+{/* Submit */}
             <motion.button id="login-submit" type="submit" disabled={loading}
               whileHover={{ scale: loading ? 1 : 1.01, boxShadow: `0 8px 25px ${meta.color}40` }}
               whileTap={{ scale: 0.98 }}

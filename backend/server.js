@@ -71,6 +71,9 @@ const startServer = async () => {
         const { initNoResponseJob } = require('./src/jobs/chat.noresponse');
         initNoResponseJob();
 
+        const { initDealReminderJob } = require('./src/jobs/deal.reminder');
+        initDealReminderJob();
+
         // ── 5. Monitoring & Routes ──
         const { authenticate } = require('./src/middleware/auth.middleware');
         const { requireRole } = require('./src/middleware/role.middleware');
