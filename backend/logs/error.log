@@ -571,3 +571,29 @@
 2026-06-27 16:06:40:640 [31merror[39m: [31mread ECONNRESET[39m
 2026-06-27 16:06:40:640 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
 2026-06-27 16:06:40:640 [31merror[39m: [31m[31mread ECONNRESET[31m[39m
+2026-06-27 16:30:41:3041 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 16:30:41:3041 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 16:30:41:3041 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 16:30:41:3041 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 20:53:46:5346 [31merror[39m: [31m[JOB] Failed to emit socket event for room 6a3bebdf9990a863cd2d220a: getIo is not a function[39m
+2026-06-27 20:54:05:545 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 20:54:05:545 [31merror[39m: [31mread ECONNRESET[39m
+2026-06-27 20:54:05:545 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 20:54:05:545 [31merror[39m: [31m[31mread ECONNRESET[31m[39m
+2026-06-27 21:26:02:262 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 21:26:02:262 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 21:26:02:262 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 21:26:02:262 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 21:31:05:315 [31merror[39m: [31mError processing complaint escalation job Complaint validation failed: comments.0.authorName: Path `authorName` is required.[39m
+2026-06-27 21:31:05:315 [31merror[39m: [31mError processing complaint escalation job Complaint validation failed: comments.0.authorName: Path `authorName` is required.[39m
+2026-06-27 22:00:00:00 [31merror[39m: [31mError processing complaint escalation job sendEmail is not a function[39m
+2026-06-27 22:00:00:00 [31merror[39m: [31mError processing complaint escalation job sendEmail is not a function[39m
+2026-06-27 22:00:00:00 [31merror[39m: [31mError processing complaint escalation job sendEmail is not a function[39m

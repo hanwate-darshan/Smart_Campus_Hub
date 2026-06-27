@@ -6,6 +6,7 @@ const { expiryQueue } = require('../jobs/marketplace.expiry');
 const { noResponseQueue } = require('../jobs/chat.noresponse');
 const { dealReminderQueue } = require('../jobs/deal.reminder');
 const { roommateFollowupQueue } = require('../jobs/roommate.followup');
+const { escalationQueue } = require('../jobs/complaint.escalation');
 
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
@@ -17,6 +18,7 @@ createBullBoard({
     new BullMQAdapter(noResponseQueue),
     new BullMQAdapter(dealReminderQueue),
     new BullMQAdapter(roommateFollowupQueue),
+    new BullMQAdapter(escalationQueue),
   ],
   serverAdapter: serverAdapter,
 });

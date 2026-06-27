@@ -16,8 +16,25 @@ import { io } from "socket.io-client";
 import toast from "react-hot-toast";
 import api from "@/lib/api";
 import useAuthStore from "@/store/auth.store";
+import LiveMap from "@/components/LiveMap";
 
 const SOS_NAMESPACE = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/sos`;
+
+const getDistanceInMeters = (coord1, coord2) => {
+  if (!coord1 || !coord2) return null;
+  const [lon1, lat1] = coord1;
+  const [lon2, lat2] = coord2;
+  const R = 6371e3;
+  const φ1 = lat1 * Math.PI/180;
+  const φ2 = lat2 * Math.PI/180;
+  const Δφ = (lat2-lat1) * Math.PI/180;
+  const Δλ = (lon2-lon1) * Math.PI/180;
+  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return Math.round(R * c);
+};
 
 export default function StudentSOSPage() {
   const { user } = useAuthStore();
@@ -30,6 +47,7 @@ export default function StudentSOSPage() {
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
   const [guardLocation, setGuardLocation] = useState(null);
+  const [isHolding, setIsHolding] = useState(false);
   
   // Internal refs
   const socketRef = useRef(null);
@@ -38,6 +56,7 @@ export default function StudentSOSPage() {
   const timerIntervalRef = useRef(null);
   const pressTimerRef = useRef(null);
   const locationUpdateIntervalRef = useRef(null);
+  const locationRef = useRef(null);
   // Bug #3 Fix: Mirror activeSOS in a ref so socket callbacks read the latest value
   const activeSOSRef = useRef(null);
 
@@ -108,6 +127,7 @@ export default function StudentSOSPage() {
         (pos) => {
           const coords = [pos.coords.longitude, pos.coords.latitude];
           setLocation(coords);
+          locationRef.current = coords;
           setError(null);
         },
         (err) => {
@@ -119,10 +139,10 @@ export default function StudentSOSPage() {
 
       // Backend update interval (every 5 seconds)
       locationUpdateIntervalRef.current = setInterval(() => {
-        if (socketRef.current && location && activeSOS) {
+        if (socketRef.current && locationRef.current && activeSOSRef.current?._id) {
           socketRef.current.emit("sos_location_update", {
-            sosId: activeSOS._id,
-            coordinates: location
+            sosId: activeSOSRef.current._id,
+            coordinates: locationRef.current
           });
         }
       }, 5000);
@@ -137,41 +157,57 @@ export default function StudentSOSPage() {
 
   // 4. ACTION HANDLERS
   const handleHoldStart = () => {
+    setIsHolding(true);
     pressTimerRef.current = setTimeout(() => {
+      setIsHolding(false);
       startSOSActivating();
     }, 1000); // 1-second hold
   };
 
   const handleHoldEnd = () => {
+    setIsHolding(false);
     if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
   };
 
   const startSOSActivating = () => {
-    if (!navigator.geolocation) {
-      toast.error("Geolocation not supported");
-      return;
+    // 1. Immediately show UI feedback
+    setSosStatus("activating");
+    setCountdown(5);
+
+    // 2. Start fetching location in the background if available
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const coords = [pos.coords.longitude, pos.coords.latitude];
+          setLocation(coords);
+          locationRef.current = coords;
+        },
+        (err) => {
+          console.warn("Geolocation warning:", err);
+          toast.error("Location access delayed or denied. Defaulting to last known.");
+        },
+        { enableHighAccuracy: true } // Removed timeout that was causing instant failures
+      );
+    } else {
+      toast.error("Geolocation not supported by this browser.");
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocation([pos.coords.longitude, pos.coords.latitude]);
-        setSosStatus("activating");
-        setCountdown(5);
-        countdownIntervalRef.current = setInterval(() => {
-          setCountdown(prev => {
-            if (prev <= 1) {
-              clearInterval(countdownIntervalRef.current);
-              triggerSOSRequest([pos.coords.longitude, pos.coords.latitude]);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-      },
-      (err) => {
-        toast.error("Location access required for SOS");
-      }
-    );
+    // 3. Start the 5-second countdown
+    countdownIntervalRef.current = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownIntervalRef.current);
+          
+          // Use locationRef (which might have been updated by the background fetch)
+          // If still null, use a fallback (0,0) so the SOS at least goes through
+          const finalLocation = locationRef.current || [0, 0];
+          triggerSOSRequest(finalLocation);
+          
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   const cancelActivating = () => {
@@ -260,17 +296,21 @@ export default function StudentSOSPage() {
 
         <div className="relative group">
           {/* Pulsing indicator */}
-          <div className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-20 scale-110" />
+          <div className={`absolute inset-0 rounded-full bg-red-500 animate-ping opacity-20 scale-110 ${isHolding ? 'opacity-50 duration-700' : ''}`} />
           
           <button
             onMouseDown={handleHoldStart}
             onMouseUp={handleHoldEnd}
+            onMouseLeave={handleHoldEnd}
             onTouchStart={handleHoldStart}
             onTouchEnd={handleHoldEnd}
+            onTouchCancel={handleHoldEnd}
             onContextMenu={(e) => e.preventDefault()}
-            className="relative w-48 h-48 md:w-56 md:h-56 rounded-full bg-red-600 hover:bg-red-700 active:scale-95 transition-all duration-300 shadow-2xl flex flex-col items-center justify-center text-white border-8 border-white dark:border-slate-800 active:bg-red-800 select-none cursor-pointer"
+            className={`relative w-48 h-48 md:w-56 md:h-56 rounded-full bg-red-600 shadow-2xl flex flex-col items-center justify-center text-white border-8 border-white dark:border-slate-800 select-none cursor-pointer transition-all duration-300 ${
+              isHolding ? "scale-90 bg-red-800 shadow-inner" : "hover:bg-red-700 hover:scale-105"
+            }`}
           >
-            <ShieldAlert className="w-12 h-12 md:w-16 md:h-16 mb-2" />
+            <ShieldAlert className={`w-12 h-12 md:w-16 md:h-16 mb-2 transition-transform duration-300 ${isHolding ? "scale-110 animate-pulse" : ""}`} />
             <span className="text-4xl md:text-5xl font-black">SOS</span>
           </button>
         </div>
@@ -319,6 +359,11 @@ export default function StudentSOSPage() {
     
     const { label, color, text, icon } = statusConfig[activeSOS.status] || statusConfig.active;
 
+    const distance = guardLocation && location 
+      ? getDistanceInMeters(guardLocation, location)
+      : null;
+    const isClose = distance !== null && distance <= 15;
+
     return (
       <div className="flex flex-col h-[calc(100vh-140px)] -m-4 sm:-m-6 lg:-m-8">
         <div className={`${color} px-6 py-4 text-white font-black text-center flex items-center justify-center gap-3 shadow-lg z-20`}>
@@ -326,20 +371,13 @@ export default function StudentSOSPage() {
           <span className="tracking-wider uppercase">SOS ACTIVE — Help is on the way</span>
         </div>
 
-        {/* Live Map Placeholder (Google Maps Style) */}
+        {/* Live Map */}
         <div className="flex-1 relative bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-hidden">
-          {/* Iframe for Google Maps Embed (Using mock coordinates) */}
           {location ? (
-            <iframe
-              width="100%"
-              height="100%"
-              frameBorder="0"
-              scrolling="no"
-              marginHeight="0"
-              marginWidth="0"
-              src={`https://maps.google.com/maps?${guardLocation ? `saddr=${location[1]},${location[0]}&daddr=${guardLocation[1]},${guardLocation[0]}` : `q=${location[1]},${location[0]}`}&z=16&output=embed&iwloc=near`}
-              className="grayscale-[0.5] invert-[0] dark:invert-[0.9] dark:hue-rotate-180"
-            ></iframe>
+            <LiveMap 
+              studentLocation={location} 
+              guardLocation={guardLocation} 
+            />
           ) : (
              <div className="w-full h-full flex items-center justify-center text-slate-400 gap-2">
                 <Loader2 className="w-6 h-6 animate-spin" /> Fetching precise location...
@@ -347,10 +385,19 @@ export default function StudentSOSPage() {
           )}
 
           {/* User Location Pulse Overlay */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10">
              <div className="w-10 h-10 bg-blue-500/20 rounded-full animate-ping" />
              <div className="w-4 h-4 bg-blue-600 rounded-full border-2 border-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-lg" />
           </div>
+
+          {activeSOS.status !== "active" && guardLocation && (
+             <div className="absolute top-6 right-6 pointer-events-none z-10">
+                <div className="bg-black/80 backdrop-blur-md px-4 py-3 rounded-2xl text-white shadow-xl pointer-events-auto">
+                   <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest text-center">Distance</p>
+                   <p className="font-black text-xl">{distance !== null ? `${distance} m` : "-- m"}</p>
+                </div>
+             </div>
+          )}
         </div>
 
         {/* Info Panel */}
@@ -373,14 +420,18 @@ export default function StudentSOSPage() {
               </div>
            </div>
 
-           {activeSOS.status === "active" && (
-             <button
-               onClick={cancelActiveSOS}
-               className="w-full py-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-white font-bold transition flex items-center justify-center gap-2"
-             >
-               <X className="w-5 h-5" /> Cancel SOS
-             </button>
-           )}
+           {/* Cancel Button - Persistent across all states */}
+           <button
+              onClick={cancelActiveSOS}
+              className={`w-full py-4 rounded-2xl font-bold transition flex items-center justify-center gap-2 ${
+                isClose 
+                ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] animate-pulse" 
+                : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-white"
+              }`}
+           >
+              {isClose ? <CheckCircle2 className="w-5 h-5" /> : <X className="w-5 h-5" />} 
+              {isClose ? "RESOLVE SOS (Close Proximity)" : "Cancel SOS"}
+           </button>
            
            {activeSOS.status !== "active" && (
               <div className="flex items-center gap-4 p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50">

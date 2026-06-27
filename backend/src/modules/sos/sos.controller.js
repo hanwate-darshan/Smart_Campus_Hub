@@ -74,14 +74,10 @@ exports.triggerSOS = async (req, res, next) => {
       console.warn("[SOS] Nearest guard query failed, falling back to broadcast:", geoErr.message);
     }
 
-    // Auto-assign to nearest guard if found
-    if (nearestGuard) {
-      sos.assignedSecurityId = nearestGuard._id;
-      sos.status = "assigned";
-      sos.assignedAt = new Date();
-      await sos.save();
-    }
-
+    // We no longer auto-assign the SOS to the nearest guard in the DB.
+    // The nearest guard will be notified as priority, but they (or any other guard) MUST explicitly accept it.
+    // This fixes the "Failed to accept SOS. It might be already assigned." error for all guards.
+    
     // ── Step 8: Real-time Broadcast ──
     const alertPayload = {
       sosId: sos._id,

@@ -4,7 +4,7 @@ const activityLogSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["new_registration", "account_approved", "account_rejected", "account_suspended", "user_created", "sos_alert", "complaint_filed"],
+      enum: ["new_registration", "account_approved", "account_rejected", "account_suspended", "account_unblocked", "account_deleted", "user_created", "sos_alert", "complaint_filed"],
       required: true,
     },
     message: {

@@ -21,9 +21,26 @@ import { io } from "socket.io-client";
 import toast from "react-hot-toast";
 import api from "@/lib/api";
 import useAuthStore from "@/store/auth.store";
+import LiveMap from "@/components/LiveMap";
 
 const SOS_NAMESPACE = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/sos`;
 const SIREN_URL = "https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3";
+
+const getDistanceInMeters = (coord1, coord2) => {
+  if (!coord1 || !coord2) return null;
+  const [lon1, lat1] = coord1;
+  const [lon2, lat2] = coord2;
+  const R = 6371e3;
+  const φ1 = lat1 * Math.PI/180;
+  const φ2 = lat2 * Math.PI/180;
+  const Δφ = (lat2-lat1) * Math.PI/180;
+  const Δλ = (lon2-lon1) * Math.PI/180;
+  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return Math.round(R * c);
+};
 
 export default function SecurityDashboardPage() {
   const { user, updateUser } = useAuthStore();
@@ -172,6 +189,14 @@ export default function SecurityDashboardPage() {
 
   // 2. ACTION HANDLERS
   const toggleDuty = async (newStatus) => {
+    // Audio Unlock
+    if (audioRef.current && audioRef.current.paused) {
+      audioRef.current.play().then(() => {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }).catch(() => {});
+    }
+
     try {
       const { data } = await api.patch("/api/security/status", { dutyStatus: newStatus });
       setDutyStatus(newStatus);
@@ -233,6 +258,11 @@ export default function SecurityDashboardPage() {
     { key: "busy", label: "Busy", color: "bg-orange-500", icon: <AlertCircle className="w-4 h-4" /> },
     { key: "offline", label: "Offline", color: "bg-slate-500", icon: <Power className="w-4 h-4" /> },
   ];
+
+  const distance = activeSOS && guardLocation && activeSOS.location?.coordinates
+    ? getDistanceInMeters(guardLocation, activeSOS.location.coordinates)
+    : null;
+  const isClose = distance !== null && distance <= 15;
 
   return (
     <div className="flex flex-col h-full space-y-6">
@@ -334,16 +364,15 @@ export default function SecurityDashboardPage() {
                <Navigation className="w-5 h-5 animate-pulse" /> RESPONDING TO SOS: {activeSOS.studentName}
             </div>
             
-            <div className="flex-1 bg-slate-200 relative">
-               {/* Map Iframe with Route (Mocking Directions via user/target markers) */}
-               <iframe
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                src={`https://maps.google.com/maps?${guardLocation ? `saddr=${guardLocation[1]},${guardLocation[0]}&daddr=${activeSOS.location.coordinates[1]},${activeSOS.location.coordinates[0]}` : `q=${activeSOS.location.coordinates[1]},${activeSOS.location.coordinates[0]}`}&z=16&output=embed`}
-               ></iframe>
+            <div className="flex-1 bg-slate-200 relative overflow-hidden">
+               {activeSOS.location?.coordinates && (
+                 <LiveMap 
+                   studentLocation={activeSOS.location.coordinates} 
+                   guardLocation={guardLocation} 
+                 />
+               )}
                
-               <div className="absolute top-6 left-6 right-6 flex items-start justify-between pointer-events-none">
+               <div className="absolute top-6 left-6 right-6 flex items-start justify-between pointer-events-none z-10">
                   <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-4 rounded-3xl shadow-xl border border-white/20 pointer-events-auto">
                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Student Information</p>
                      <h3 className="font-black text-lg text-slate-800 dark:text-white">{activeSOS.studentName}</h3>
@@ -354,7 +383,7 @@ export default function SecurityDashboardPage() {
 
                   <div className="bg-black/80 backdrop-blur-md px-6 py-4 rounded-3xl text-white shadow-xl pointer-events-auto">
                      <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest text-center">Distance</p>
-                     <p className="font-black text-2xl">-- m</p>
+                     <p className="font-black text-2xl">{distance !== null ? `${distance} m` : "-- m"}</p>
                   </div>
                </div>
             </div>
@@ -376,9 +405,9 @@ export default function SecurityDashboardPage() {
 
               <button
                 onClick={() => updateStatus("resolved")}
-                className="flex-1 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2"
+                className={`flex-1 py-4 rounded-2xl text-white font-black shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${isClose ? "bg-emerald-500 hover:bg-emerald-600 animate-pulse ring-4 ring-emerald-300" : "bg-emerald-600 hover:bg-emerald-700"}`}
               >
-                <CheckCircle2 /> MARK AS RESOLVED
+                <CheckCircle2 /> {isClose ? "PROXIMITY: RESOLVE" : "MARK AS RESOLVED"}
               </button>
 
               <button
