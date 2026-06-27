@@ -30,6 +30,8 @@ export default function NotificationBell() {
 
     const notificationsNs = getNamespace("/notifications");
     notificationsNs.emit("join", user._id);
+    if (user.role === 'admin') notificationsNs.emit("join_admin");
+    if (user.role === 'teacher') notificationsNs.emit("join_teacher");
 
     const handleNewNotification = (payload) => {
       setUnreadCount((prev) => prev + 1);

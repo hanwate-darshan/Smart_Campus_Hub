@@ -53,6 +53,11 @@ const listingSchema = new mongoose.Schema(
       enum: ["pending", "approved", "sold", "expired", "rejected"],
       default: "pending",
     },
+    soldConfirmedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
     reportCount: {
       type: Number,
       default: 0,

@@ -29,6 +29,7 @@ export default function StudentSOSPage() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
+  const [guardLocation, setGuardLocation] = useState(null);
   
   // Internal refs
   const socketRef = useRef(null);
@@ -59,8 +60,11 @@ export default function StudentSOSPage() {
   // 2. SOCKET INITIALIZATION (When SOS becomes active) — runs once per session
   useEffect(() => {
     if (sosStatus === "active" && !socketRef.current) {
-      const token = localStorage.getItem("accessToken");
-      socketRef.current = io(SOS_NAMESPACE, { auth: { token } });
+      socketRef.current = io(SOS_NAMESPACE, { 
+        auth: (cb) => {
+          cb({ token: localStorage.getItem("accessToken") });
+        }
+      });
 
       socketRef.current.on("connect", () => {
         console.log("[SOS Socket] Connected");
@@ -71,11 +75,15 @@ export default function StudentSOSPage() {
       });
 
       socketRef.current.on("sos_status_update", (payload) => {
-        if (payload.status === "resolved" || payload.status === "cancelled") {
-          handleResolution();
+        if (payload.status === "resolved" || payload.status === "cancelled" || payload.status === "fake") {
+          handleResolution(payload.status);
         } else {
           setActiveSOS(prev => ({ ...prev, ...payload }));
         }
+      });
+
+      socketRef.current.on("security_location_update", (payload) => {
+        setGuardLocation(payload.coordinates);
       });
 
       socketRef.current.on("connect_error", (err) => {
@@ -207,8 +215,8 @@ export default function StudentSOSPage() {
     }
   };
 
-  const handleResolution = () => {
-    setSosStatus("resolved");
+  const handleResolution = (finalStatus = "resolved") => {
+    setSosStatus(finalStatus);
     stopTracking();
     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
     setTimeout(() => {
@@ -329,7 +337,7 @@ export default function StudentSOSPage() {
               scrolling="no"
               marginHeight="0"
               marginWidth="0"
-              src={`https://maps.google.com/maps?q=${location[1]},${location[0]}&z=16&output=embed&iwloc=near`}
+              src={`https://maps.google.com/maps?${guardLocation ? `saddr=${location[1]},${location[0]}&daddr=${guardLocation[1]},${guardLocation[0]}` : `q=${location[1]},${location[0]}`}&z=16&output=embed&iwloc=near`}
               className="grayscale-[0.5] invert-[0] dark:invert-[0.9] dark:hue-rotate-180"
             ></iframe>
           ) : (
@@ -404,6 +412,23 @@ export default function StudentSOSPage() {
         <p className="text-xl text-blue-100 font-medium mb-12">Your emergency has been marked as resolved by security.</p>
         <div className="text-2xl font-bold bg-white/20 px-8 py-3 rounded-full backdrop-blur-sm">Stay safe!</div>
         <p className="mt-12 text-blue-200 text-sm">Returning to dashboard in 5 seconds...</p>
+      </div>
+    );
+  }
+
+  // --- STATE 4: FAKE ---
+  if (sosStatus === "fake") {
+    return (
+      <div className="fixed inset-0 z-[100] bg-red-900 flex flex-col items-center justify-center p-6 text-center text-white">
+        <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center text-red-600 mb-8 animate-pulse">
+           <AlertTriangle className="w-16 h-16" />
+        </div>
+        <h2 className="text-4xl font-black mb-4 tracking-tight">SOS MARKED AS FAKE</h2>
+        <p className="text-xl text-red-100 font-medium mb-12">Your emergency was flagged as fake by security.</p>
+        <div className="text-xl font-bold bg-white/20 px-8 py-3 rounded-xl backdrop-blur-sm border border-red-500/50">
+          Warning: 3 strikes result in Account Suspension.
+        </div>
+        <p className="mt-12 text-red-200 text-sm">Returning to dashboard in 5 seconds...</p>
       </div>
     );
   }

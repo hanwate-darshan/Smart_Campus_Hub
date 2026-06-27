@@ -3,6 +3,7 @@ const ChatRoom = require("../models/ChatRoom.model");
 const Listing = require("../models/Listing.model");
 const pushNotification = require("../utils/pushNotification");
 const logger = require("../config/logger");
+const { getIo } = require("../config/socket");
 
 const REDIS_OPTIONS = {
   connection: {
@@ -20,14 +21,14 @@ const dealReminderWorker = new Worker(
     logger.info(`[JOB] Starting deal completion reminder check: ${job.id}`);
     
     // 24 hours ago
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-    // Find rooms that were created more than 24 hours ago and haven't had a deal reminder sent
     const rooms = await ChatRoom.find({
       type: "marketplace",
+      dealStatus: "none",
       isLocked: false,
-      createdAt: { $lt: twentyFourHoursAgo },
-      dealReminderNotifiedAt: null
+      lastMessageAt: { $ne: null, $lt: cutoff },
+      reminderSentAt: null
     }).populate("listingId");
 
     let notificationsSent = 0;
@@ -37,25 +38,40 @@ const dealReminderWorker = new Worker(
         continue;
       }
 
-      // Notify both participants
-      for (const participantId of room.participants) {
-        // Is this participant the seller?
-        const isSeller = room.listingId.sellerId.toString() === participantId.toString();
+      const sellerId = room.listingId.sellerId.toString();
+      const buyerId = room.participants.find(p => p.toString() !== sellerId)?.toString();
 
-        pushNotification(participantId, {
-          type: "system_alert",
-          title: "Did you complete this deal?",
-          message: isSeller 
-            ? `If you have sold "${room.listingId.title}", please mark it as sold in the chat.`
-            : `Did you buy "${room.listingId.title}"? If so, remind the seller to mark it as sold.`,
-          link: `/student/marketplace/chat/${room._id}`
-        });
-      }
+      if (!buyerId) continue;
+
+      pushNotification(sellerId, {
+        type: "deal_check_in",
+        title: "Did you complete this deal?",
+        message: 'If you met and sold "' + room.listingId.title + '", please mark it as sold.',
+        link: "/student/marketplace/chat/" + room._id
+      });
+
+      pushNotification(buyerId, {
+        type: "deal_check_in",
+        title: "Did you complete this deal?",
+        message: 'If you bought "' + room.listingId.title + '", let the seller know to confirm.',
+        link: "/student/marketplace/chat/" + room._id
+      });
 
       // Update room
-      room.dealReminderNotifiedAt = new Date();
+      room.reminderSentAt = new Date();
       await room.save();
-      notificationsSent += room.participants.length;
+      notificationsSent += 2;
+
+      // Emit socket event
+      try {
+        const io = getIo();
+        io.to(`room:${room._id}`).emit("deal_reminder", {
+          roomId: room._id,
+          message: "Did you complete this deal? If sold, the seller should mark it."
+        });
+      } catch (err) {
+        logger.error(`[JOB] Failed to emit socket event for room ${room._id}:`, err);
+      }
     }
 
     logger.info(`[JOB] Deal reminder check completed. Sent ${notificationsSent} notifications.`);
@@ -64,10 +80,9 @@ const dealReminderWorker = new Worker(
   REDIS_OPTIONS
 );
 
-// Schedule the recurring job (every 6 hours)
+// Schedule the recurring job (every 4 hours as requested)
 const initDealReminderJob = async () => {
   try {
-    // Remove existing repeatable jobs to avoid duplicates
     const repeatableJobs = await dealReminderQueue.getRepeatableJobs();
     for (const job of repeatableJobs) {
       await dealReminderQueue.removeRepeatableByKey(job.key);
@@ -78,11 +93,11 @@ const initDealReminderJob = async () => {
       {},
       {
         repeat: {
-          pattern: "0 */6 * * *", // Every 6 hours
+          pattern: "0 */4 * * *", // Every 4 hours
         },
       }
     );
-    logger.info("[JOB] Marketplace Deal Reminder job scheduled (Every 6 hours).");
+    logger.info("[JOB] Marketplace Deal Reminder job scheduled (Every 4 hours).");
   } catch (err) {
     logger.error("[JOB] Failed to schedule deal reminder job: ", err);
   }

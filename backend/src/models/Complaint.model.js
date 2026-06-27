@@ -72,6 +72,10 @@ const complaintSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
+        authorName: {
+          type: String,
+          required: true,
+        },
         text: {
           type: String,
           required: true,
@@ -92,6 +96,7 @@ const complaintSchema = new mongoose.Schema(
 complaintSchema.index({ status: 1, createdAt: -1 });
 complaintSchema.index({ studentId: 1 });
 complaintSchema.index({ category: 1 });
+complaintSchema.index({ category: 1, createdAt: -1 });
 
 const Complaint = mongoose.model("Complaint", complaintSchema);
 

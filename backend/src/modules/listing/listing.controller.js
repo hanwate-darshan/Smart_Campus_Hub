@@ -211,36 +211,161 @@ exports.updateListingStatus = async (req, res, next) => {
   }
 };
 
-// Route 6: Mark as Sold
-exports.markAsSold = async (req, res, next) => {
+// Route: Get My Listings With Deal Status
+exports.getMyListingsWithDealStatus = async (req, res, next) => {
   try {
-    const listing = await Listing.findOne({ _id: req.params.id, sellerId: req.user._id });
-    if (!listing) return res.status(404).json({ success: false, error: "Listing not found or unauthorized" });
+    const sellerId = req.user._id;
+    const listings = await Listing.find({ sellerId }).sort({ createdAt: -1 });
 
-    listing.status = "sold";
-    await listing.save();
-
-    // Invalidate Cache
-    await invalidateMarketplaceCache();
-
-    // Lock all related chat rooms
-    await ChatRoom.updateMany({ listingId: listing._id }, { isLocked: true });
-
-    // Notify all OTHER buyers who had chat rooms for this listing
-    const chatRooms = await ChatRoom.find({ listingId: listing._id });
-    for (const room of chatRooms) {
-      const buyerId = room.participants.find(p => p.toString() !== req.user._id.toString());
-      if (buyerId) {
-        pushNotification(buyerId, {
-          type: "listing_sold",
-          title: "Item No Longer Available",
-          message: 'The item "' + listing.title + '" has been sold to someone else.',
-          link: "/student/marketplace"
+    const listingsWithStatus = await Promise.all(
+      listings.map(async (listing) => {
+        const hasPending = await ChatRoom.exists({
+          listingId: listing._id,
+          dealStatus: "pending_confirmation"
         });
-      }
+        return {
+          ...listing.toObject(),
+          hasPendingConfirmation: !!hasPending
+        };
+      })
+    );
+
+    res.json({ success: true, count: listingsWithStatus.length, data: listingsWithStatus });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route 6: Claim Sold (Pending Buyer Confirmation)
+exports.claimSoldController = async (req, res, next) => {
+  try {
+    const listingId = req.params.id;
+    const sellerId = req.user._id;
+    const { chatRoomId } = req.body;
+
+    const listing = await Listing.findOne({ _id: listingId, sellerId });
+    if (!listing) return res.status(403).json({ success: false, error: "Not authorized." });
+
+    if (listing.status !== "approved") {
+      return res.status(400).json({ success: false, error: "This listing cannot be marked as sold right now." });
     }
 
-    res.json({ success: true, message: "Item marked as sold and chats locked." });
+    const chatRoom = await ChatRoom.findById(chatRoomId);
+    if (!chatRoom || !chatRoom.participants.includes(sellerId)) {
+      return res.status(404).json({ success: false, error: "Chat room not found." });
+    }
+
+    chatRoom.dealStatus = "pending_confirmation";
+    chatRoom.soldClaimedAt = new Date();
+    await chatRoom.save();
+
+    const buyerId = chatRoom.participants.find(p => p.toString() !== sellerId.toString());
+
+    pushNotification(buyerId, {
+      type: "confirm_purchase",
+      title: "Confirm Your Purchase",
+      message: 'The seller marked "' + listing.title + '" as sold to you. Please confirm.',
+      link: "/student/marketplace/chat/" + chatRoomId
+    });
+
+    const { getIO } = require("../../config/socket");
+    const io = getIO();
+    io.to(`room:${chatRoomId}`).emit("deal_status_update", {
+      chatRoomId,
+      dealStatus: "pending_confirmation",
+      message: "Seller marked this item as sold. Waiting for buyer confirmation."
+    });
+
+    res.json({ success: true, message: "Waiting for buyer to confirm the purchase." });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route: Confirm Purchase (Buyer)
+exports.confirmPurchaseController = async (req, res, next) => {
+  try {
+    const { chatRoomId, confirmed } = req.body;
+    const buyerId = req.user._id;
+
+    const chatRoom = await ChatRoom.findById(chatRoomId);
+    if (!chatRoom || !chatRoom.participants.includes(buyerId)) {
+      return res.status(404).json({ success: false, error: "Chat room not found." });
+    }
+
+    if (chatRoom.dealStatus !== "pending_confirmation") {
+      return res.status(400).json({ success: false, error: "No pending confirmation for this chat." });
+    }
+
+    const listing = await Listing.findById(chatRoom.listingId);
+    const sellerId = chatRoom.participants.find(p => p.toString() !== buyerId.toString());
+
+    const { getIO } = require("../../config/socket");
+    const io = getIO();
+
+    if (confirmed === true) {
+      listing.status = "sold";
+      listing.soldConfirmedBy = buyerId;
+      await listing.save();
+
+      chatRoom.dealStatus = "confirmed_sold";
+      chatRoom.isLocked = true;
+      await chatRoom.save();
+
+      // Lock all other chat rooms for this listing
+      const otherRooms = await ChatRoom.find({ listingId: listing._id, _id: { $ne: chatRoomId } });
+      for (const room of otherRooms) {
+        room.isLocked = true;
+        room.dealStatus = "deal_failed";
+        await room.save();
+        
+        const otherBuyerId = room.participants.find(p => p.toString() !== sellerId.toString());
+        if (otherBuyerId) {
+          pushNotification(otherBuyerId, {
+            type: "listing_sold",
+            title: "Item No Longer Available",
+            message: 'The item "' + listing.title + '" has been sold to someone else.',
+            link: "/student/marketplace"
+          });
+        }
+      }
+
+      const buyerUser = await User.findById(buyerId);
+      pushNotification(sellerId, {
+        type: "sale_confirmed",
+        title: "Sale Confirmed!",
+        message: `${buyerUser.name} confirmed the purchase of '${listing.title}'.`,
+        link: "/student/marketplace"
+      });
+
+      io.to(`room:${chatRoomId}`).emit("deal_status_update", {
+        chatRoomId,
+        dealStatus: "confirmed_sold",
+        message: "Purchase confirmed! This chat is now closed."
+      });
+      
+      // Invalidate Cache since status changed
+      await invalidateMarketplaceCache();
+    } else {
+      chatRoom.dealStatus = "deal_failed";
+      await chatRoom.save();
+
+      const buyerUser = await User.findById(buyerId);
+      pushNotification(sellerId, {
+        type: "sale_not_confirmed",
+        title: "Buyer Did Not Confirm",
+        message: `${buyerUser.name} said the deal did not happen. Your listing is still active.`,
+        link: "/student/marketplace"
+      });
+
+      io.to(`room:${chatRoomId}`).emit("deal_status_update", {
+        chatRoomId,
+        dealStatus: "deal_failed",
+        message: "Buyer indicated the deal did not happen. You can continue chatting."
+      });
+    }
+
+    res.json({ success: true, data: { dealStatus: chatRoom.dealStatus } });
   } catch (err) {
     next(err);
   }

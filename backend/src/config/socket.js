@@ -42,6 +42,11 @@ const initSocket = async (httpServer) => {
       console.log(`[Notifications] ${socket.id} joined room admin`);
     });
 
+    socket.on('join_teacher', () => {
+      socket.join('teacher:room');
+      console.log(`[Notifications] ${socket.id} joined room teacher:room`);
+    });
+
     socket.on('disconnect', () => {
       console.log(`[Notifications] Client disconnected: ${socket.id}`);
     });

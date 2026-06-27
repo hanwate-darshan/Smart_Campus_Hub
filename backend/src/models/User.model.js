@@ -88,6 +88,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    fakeSosCount: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

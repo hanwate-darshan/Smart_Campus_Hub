@@ -52,6 +52,19 @@ const chatRoomSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    dealStatus: {
+      type: String,
+      enum: ["none", "pending_confirmation", "confirmed_sold", "deal_failed"],
+      default: "none",
+    },
+    soldClaimedAt: {
+      type: Date,
+      default: null,
+    },
+    reminderSentAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

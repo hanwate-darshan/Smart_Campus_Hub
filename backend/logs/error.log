@@ -439,3 +439,102 @@
 2026-06-24 22:24:27:2427 [31merror[39m: [31m[31m[31m[31mread ECONNRESET[31m[31m[31m[39m
 2026-06-24 22:24:27:2427 [31merror[39m: [31mUNHANDLED REJECTION! 💥 Shutting down...[39m
 2026-06-24 22:24:27:2427 [31merror[39m: [31m[31m[31m[31m[31mread ECONNRESET[31m[31m[31m[31m[39m
+2026-06-25 11:54:02:542 [31merror[39m: [31mFailed to start server: argument handler must be a function[39m
+2026-06-25 12:18:22:1822 [31merror[39m: [31mFailed to start server: argument handler must be a function[39m
+2026-06-25 12:18:38:1838 [31merror[39m: [31mFailed to start server: Cannot find module '../../middleware/upload.middleware'[39m
+[31mRequire stack:[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\complaint\complaint.routes.js[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\server.js[39m
+2026-06-25 12:20:21:2021 [31merror[39m: [31mFailed to start server: Cannot find module 'bull'[39m
+[31mRequire stack:[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\jobs\complaint.escalation.js[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\server.js[39m
+2026-06-25 13:31:44:3144 [31merror[39m: [31mFailed to start server: Cannot find module 'bull'[39m
+[31mRequire stack:[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\jobs\complaint.escalation.js[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\server.js[39m
+2026-06-25 13:32:28:3228 [31merror[39m: [31mFailed to start server: Cannot find module 'bull'[39m
+[31mRequire stack:[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\jobs\complaint.escalation.js[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\server.js[39m
+2026-06-25 15:07:35:735 [31merror[39m: [31mFailed to start server: Cannot find module 'bull'[39m
+[31mRequire stack:[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\jobs\complaint.escalation.js[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\server.js[39m
+2026-06-25 15:08:48:848 [31merror[39m: [31mFailed to start server: Cannot find module '../../middleware/upload.middleware'[39m
+[31mRequire stack:[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\complaint\complaint.routes.js[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\server.js[39m
+2026-06-25 15:09:18:918 [31merror[39m: [31mFailed to start server: Cannot find module '../../middleware/upload.middleware'[39m
+[31mRequire stack:[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\complaint\complaint.routes.js[39m
+[31m- C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\server.js[39m
+2026-06-25 15:10:26:1026 [31merror[39m: [31mFailed to start server: requireRole is not a function[39m
+2026-06-25 15:11:01:111 [31merror[39m: [31mFailed to start server: requireRole is not a function[39m
+2026-06-25 15:15:36:1536 [31merror[39m: [31mUNHANDLED REJECTION! 💥 Shutting down...[39m
+2026-06-25 15:15:36:1536 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-25 15:23:11:2311 [31merror[39m: [31mUNHANDLED REJECTION! 💥 Shutting down...[39m
+2026-06-25 15:23:11:2311 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-25 15:36:21:3621 [31merror[39m: [31mUNHANDLED REJECTION! 💥 Shutting down...[39m
+2026-06-25 15:36:21:3621 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-25 15:57:56:5756 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-25 15:57:56:5756 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-25 16:38:24:3824 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-25 16:38:24:3824 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-25 20:29:10:2910 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-25 20:29:10:2910 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-25 21:11:54:1154 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-25 21:11:54:1154 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-25 22:07:13:713 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-25 22:07:13:713 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-25 22:13:39:1339 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-25 22:13:39:1339 [31merror[39m: [31mread ECONNRESET[39m
+2026-06-25 22:13:39:1339 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-25 22:13:39:1339 [31merror[39m: [31m[31mread ECONNRESET[31m[39m
+2026-06-25 22:13:39:1339 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-25 22:13:39:1339 [31merror[39m: [31m[31m[31mread ECONNRESET[31m[31m[39m
+2026-06-25 22:13:39:1339 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-25 22:13:39:1339 [31merror[39m: [31m[31m[31m[31mread ECONNRESET[31m[31m[31m[39m
+2026-06-25 22:20:03:203 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-25 22:20:03:203 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 14:02:19:219 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 14:02:19:219 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 14:03:20:320 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 14:03:20:320 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 14:36:15:3615 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 14:36:15:3615 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 14:46:19:4619 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 14:46:19:4619 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 15:01:12:112 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 15:01:12:112 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 15:15:12:1512 [31merror[39m: [31mFailed to start server: Unexpected token 'catch'[39m
+2026-06-26 15:15:25:1525 [31merror[39m: [31mFailed to start server: Unexpected token 'catch'[39m
+2026-06-26 15:17:16:1716 [31merror[39m: [31mFailed to start server: Unexpected token 'catch'[39m
+2026-06-26 15:17:31:1731 [31merror[39m: [31mFailed to start server: Unexpected token 'catch'[39m
+2026-06-26 15:30:45:3045 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 15:30:45:3045 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 16:00:46:046 [31merror[39m: [31mFailed to emit complaint socket notification getIo is not a function[39m
+2026-06-26 16:00:46:046 [31merror[39m: [31mFailed to send confirmation email to hitesh@gmail.com sendEmail is not a function[39m
+2026-06-26 20:02:49:249 [31merror[39m: [31mError in getComplaintById controller Cast to ObjectId failed for value "stats" (type string) at path "_id" for model "Complaint"[39m
+2026-06-26 20:02:49:249 [31merror[39m: [31mError in getComplaintById controller Cast to ObjectId failed for value "stats" (type string) at path "_id" for model "Complaint"[39m
+2026-06-26 20:03:50:350 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 20:03:51:351 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 20:04:24:424 [31merror[39m: [31mError in updateStatus controller Complaint validation failed: comments.0.authorName: Path `authorName` is required., comments.1.authorName: Path `authorName` is required.[39m
+2026-06-26 20:36:12:3612 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 20:36:12:3612 [31merror[39m: [31mread ECONNRESET[39m
+2026-06-26 20:36:12:3612 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 20:36:12:3612 [31merror[39m: [31m[31mread ECONNRESET[31m[39m
+2026-06-26 20:55:16:5516 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 20:55:17:5517 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 20:55:25:5525 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 20:55:26:5526 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 21:46:11:4611 [31merror[39m: [31mError in getComplaintById controller Cast to ObjectId failed for value "stats" (type string) at path "_id" for model "Complaint"[39m
+2026-06-26 21:46:11:4611 [31merror[39m: [31mError in getComplaintById controller Cast to ObjectId failed for value "stats" (type string) at path "_id" for model "Complaint"[39m
+2026-06-26 21:52:59:5259 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 21:52:59:5259 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 21:53:00:530 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 21:53:00:530 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 22:04:22:422 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 22:04:22:422 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-26 22:04:27:427 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-26 22:04:27:427 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m

@@ -8,10 +8,14 @@ const roommateProfileSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    budget: {
-      type: Number,
-      required: [true, "Budget is required"],
-      min: [0, "Budget cannot be negative"],
+    gender: {
+      type: String,
+      required: true,
+      enum: ["male", "female", "other"],
+    },
+    budgetRange: {
+      min: { type: Number, required: true },
+      max: { type: Number, required: true },
     },
     department: {
       type: String,
@@ -23,28 +27,16 @@ const roommateProfileSchema = new mongoose.Schema(
       required: true,
       enum: ["1st", "2nd", "3rd", "4th"],
     },
-    smoking: {
-      type: Boolean,
-      required: [true, "Smoking preference is required"],
+    location: {
+      state: { type: String, required: [true, "State is required"], trim: true },
+      city: { type: String, required: [true, "City is required"], trim: true },
+      area: { type: String, required: [true, "Area is required"], trim: true }
     },
-    sleepSchedule: {
+
+    duration: {
       type: String,
       required: true,
-      enum: ["early", "late"],
-    },
-    cleanliness: {
-      type: String,
-      required: true,
-      enum: ["low", "medium", "high"],
-    },
-    hobbies: {
-      type: [String],
-      validate: {
-        validator: function (v) {
-          return v && v.length <= 10;
-        },
-        message: "You can list up to 10 hobbies",
-      },
+      enum: ["semester", "year", "long_term"],
     },
     bio: {
       type: String,

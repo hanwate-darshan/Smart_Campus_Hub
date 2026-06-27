@@ -73,6 +73,9 @@ const startServer = async () => {
 
         const { initDealReminderJob } = require('./src/jobs/deal.reminder');
         initDealReminderJob();
+        
+        const { initComplaintEscalationJob } = require('./src/jobs/complaint.escalation');
+        initComplaintEscalationJob();
 
         // ── 5. Monitoring & Routes ──
         const { authenticate } = require('./src/middleware/auth.middleware');
@@ -134,17 +137,21 @@ server.on('error', (err) => {
 
         // ── 6. Global Rejection Handlers ──
         process.on('unhandledRejection', (err) => {
-            logger.error('UNHANDLED REJECTION! 💥 Shutting down...');
+            logger.error('UNHANDLED REJECTION! 💥');
             logger.error(err);
-            server.close(() => {
-                process.exit(1);
-            });
+            if (process.env.NODE_ENV === 'production') {
+                server.close(() => {
+                    process.exit(1);
+                });
+            }
         });
 
         process.on('uncaughtException', (err) => {
-            logger.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+            logger.error('UNCAUGHT EXCEPTION! 💥');
             logger.error(err);
-            process.exit(1);
+            if (process.env.NODE_ENV === 'production') {
+                process.exit(1);
+            }
         });
 
     } catch (err) {
@@ -154,3 +161,6 @@ server.on('error', (err) => {
 };
 
 startServer();
+
+// Trigger nodemon restart
+// Trigger nodemon restart

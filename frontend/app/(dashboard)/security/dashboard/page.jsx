@@ -26,7 +26,7 @@ const SOS_NAMESPACE = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:50
 const SIREN_URL = "https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3";
 
 export default function SecurityDashboardPage() {
-  const { user, setUser } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
   
   // States
   const [dutyStatus, setDutyStatus] = useState(user?.dutyStatus || "available");
@@ -59,9 +59,10 @@ export default function SecurityDashboardPage() {
     audioRef.current.loop = true;
 
     // Initialize Socket
-    const token = localStorage.getItem("accessToken");
     socketRef.current = io(SOS_NAMESPACE, {
-      auth: { token }
+      auth: (cb) => {
+        cb({ token: localStorage.getItem("accessToken") });
+      }
     });
 
     socketRef.current.on("connect", () => {
@@ -156,9 +157,11 @@ export default function SecurityDashboardPage() {
         (pos) => {
           const coords = [pos.coords.longitude, pos.coords.latitude];
           setGuardLocation(coords);
-          // Send to backend via socket
           if (socketRef.current) {
-            socketRef.current.emit("security_location_update", { coordinates: coords });
+            socketRef.current.emit("security_location_update", { 
+              coordinates: coords,
+              sosId: activeSOSRef.current?.sosId // Send sosId so backend knows who to broadcast to
+            });
           }
         },
         null,
@@ -172,8 +175,7 @@ export default function SecurityDashboardPage() {
     try {
       const { data } = await api.patch("/api/security/status", { dutyStatus: newStatus });
       setDutyStatus(newStatus);
-      // Update store user
-      setUser({ ...user, dutyStatus: newStatus });
+      updateUser({ dutyStatus: newStatus });
       toast.success(`You are now ${newStatus}`);
     } catch (err) {
       toast.error("Failed to update duty status");
@@ -200,13 +202,18 @@ export default function SecurityDashboardPage() {
   };
 
   const updateStatus = async (status) => {
+    if (status === "fake") {
+      const confirmed = window.confirm("Are you sure this is a fake emergency? This will give the student a strike, and 3 strikes result in automatic account suspension.");
+      if (!confirmed) return;
+    }
+
     try {
       await api.patch(`/api/sos/${activeSOS.sosId}/status`, { status });
       setActiveSOS(prev => ({ ...prev, status }));
-      if (status === "resolved") {
+      if (status === "resolved" || status === "fake") {
         setDutyStatus("available");
         setActiveSOS(null);
-        toast.success("SOS Resolved successfully!");
+        toast.success(status === "fake" ? "SOS Marked as Fake." : "SOS Resolved successfully!");
       } else {
         toast.success("Status updated to: " + status);
       }
@@ -272,10 +279,52 @@ export default function SecurityDashboardPage() {
                   : "You are not receiving new alerts right now."}
               </p>
             </div>
-            {guardLocation && (
+            {guardLocation && !alertSOS && (
                <div className="text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-full flex items-center gap-2">
                   <MapPin className="w-4 h-4" /> Ready at your current coordinates
                </div>
+            )}
+            
+            {/* INLINE ALERT RENDERING */}
+            {alertSOS && (
+              <div className={`mt-8 max-w-2xl w-full mx-auto bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 text-center relative overflow-hidden border-2 ${alertSOS.isPriority ? "border-amber-400 shadow-[0_0_40px_rgba(245,158,11,0.2)]" : "border-red-500 shadow-[0_0_40px_rgba(255,0,0,0.2)]"}`}>
+                 <div className={`absolute inset-0 animate-pulse ${alertSOS.isPriority ? "bg-amber-500/5" : "bg-red-500/5"}`} />
+
+                 <div className="relative z-10">
+                   {alertSOS.isPriority && (
+                     <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 font-black text-xs px-3 py-1 rounded-full mb-4 border-2 border-amber-300 animate-pulse">
+                       <Navigation className="w-3 h-3" /> YOU ARE ASSIGNED
+                     </div>
+                   )}
+
+                   <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce ${alertSOS.isPriority ? "bg-amber-100 text-amber-600" : "bg-red-100 text-red-600"}`}>
+                     <ShieldAlert className="w-8 h-8" />
+                   </div>
+
+                   <h2 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white mb-2 uppercase tracking-tight">
+                     {alertSOS.isPriority ? "Respond Immediately!" : "New SOS Emergency!"}
+                   </h2>
+                   
+                   <div className="flex items-center justify-center gap-2 text-xl font-bold text-slate-700 dark:text-slate-200 mb-6">
+                      <User className={alertSOS.isPriority ? "text-amber-600" : "text-red-600"} /> {alertSOS.studentName}
+                   </div>
+
+                   <div className="flex flex-col md:flex-row gap-4 justify-center">
+                      <button
+                       onClick={acceptSOS}
+                       className={`px-8 py-4 rounded-2xl text-white font-black text-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${alertSOS.isPriority ? "bg-amber-500 hover:bg-amber-600" : "bg-red-600 hover:bg-red-700"}`}
+                      >
+                        ACCEPT <Navigation className="animate-pulse w-5 h-5" />
+                      </button>
+                      <button
+                       onClick={dismissAlert}
+                       className="px-8 py-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 font-bold transition-all"
+                      >
+                        DISMISS
+                      </button>
+                   </div>
+                 </div>
+              </div>
             )}
           </div>
         ) : (
@@ -291,7 +340,7 @@ export default function SecurityDashboardPage() {
                 width="100%"
                 height="100%"
                 frameBorder="0"
-                src={`https://maps.google.com/maps?q=${activeSOS.location.coordinates[1]},${activeSOS.location.coordinates[0]}&z=16&output=embed`}
+                src={`https://maps.google.com/maps?${guardLocation ? `saddr=${guardLocation[1]},${guardLocation[0]}&daddr=${activeSOS.location.coordinates[1]},${activeSOS.location.coordinates[0]}` : `q=${activeSOS.location.coordinates[1]},${activeSOS.location.coordinates[0]}`}&z=16&output=embed`}
                ></iframe>
                
                <div className="absolute top-6 left-6 right-6 flex items-start justify-between pointer-events-none">
@@ -311,7 +360,7 @@ export default function SecurityDashboardPage() {
             </div>
 
             {/* ACTION FOOTER */}
-            <div className="p-6 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 flex flex-col md:flex-row gap-4">
+            <div className="p-6 bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 flex flex-col lg:flex-row gap-4">
               <button
                 disabled={activeSOS.status === "reached"}
                 onClick={() => updateStatus("reached")}
@@ -331,72 +380,19 @@ export default function SecurityDashboardPage() {
               >
                 <CheckCircle2 /> MARK AS RESOLVED
               </button>
+
+              <button
+                onClick={() => updateStatus("fake")}
+                className="flex-1 py-4 rounded-2xl bg-red-100 hover:bg-red-200 text-red-700 font-black shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-200"
+              >
+                <AlertCircle /> MARK AS FAKE
+              </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* --- FULL SCREEN ALERT MODAL --- */}
-      {alertSOS && (
-        <div className={`fixed inset-0 z-[200] p-6 flex items-center justify-center animate-in zoom-in duration-300 ${alertSOS.isPriority ? "bg-amber-500" : "bg-red-600"}`}>
-           <div className={`max-w-2xl w-full bg-white dark:bg-slate-900 rounded-[3rem] p-8 md:p-12 text-center relative overflow-hidden ${alertSOS.isPriority ? "shadow-[0_0_100px_rgba(245,158,11,0.6)]" : "shadow-[0_0_100px_rgba(255,0,0,0.5)]"}`}>
-              <div className={`absolute inset-0 animate-pulse ${alertSOS.isPriority ? "bg-amber-500/5" : "bg-red-500/5"}`} />
-
-              <div className="relative z-10">
-                {/* Priority badge — only shown for nearest-guard assignment */}
-                {alertSOS.isPriority && (
-                  <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 font-black text-sm px-4 py-2 rounded-full mb-6 border-2 border-amber-300 animate-pulse">
-                    <Navigation className="w-4 h-4" /> YOU ARE THE ASSIGNED GUARD
-                  </div>
-                )}
-
-                <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce ${alertSOS.isPriority ? "bg-amber-100 text-amber-600" : "bg-red-100 text-red-600"}`}>
-                  <ShieldAlert className="w-12 h-12" />
-                </div>
-
-                <h2 className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white mb-2 uppercase tracking-tighter">
-                  {alertSOS.isPriority ? "Respond Immediately!" : "New SOS Emergency!"}
-                </h2>
-                <div className={`h-1 w-20 mx-auto mb-8 rounded-full ${alertSOS.isPriority ? "bg-amber-500" : "bg-red-600"}`} />
-
-                <div className="space-y-6 mb-12">
-                   <div className="flex items-center justify-center gap-4 text-2xl font-bold text-slate-700 dark:text-slate-200">
-                      <User className={alertSOS.isPriority ? "text-amber-600" : "text-red-600"} /> {alertSOS.studentName}
-                   </div>
-                   <div className="flex items-center justify-center gap-4 text-xl text-slate-500">
-                      <MapPin className={alertSOS.isPriority ? "text-amber-600" : "text-red-600"} /> Campus Hub Vicinity
-                   </div>
-                   <div className={`p-4 rounded-2xl font-bold ${alertSOS.isPriority ? "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400" : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"}`}>
-                     Triggered {new Date(alertSOS.timestamp).toLocaleTimeString()}
-                   </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row gap-4">
-                   <button
-                    onClick={acceptSOS}
-                    className={`flex-1 py-6 rounded-[2rem] text-white font-black text-2xl shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-3 ${alertSOS.isPriority ? "bg-amber-500 hover:bg-amber-600" : "bg-red-600 hover:bg-red-700"}`}
-                   >
-                     ACCEPT SOS <Navigation className="animate-pulse" />
-                   </button>
-                   <button
-                    onClick={dismissAlert}
-                    className="px-8 py-6 rounded-[2rem] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 font-bold transition-all"
-                   >
-                     DISMISS
-                   </button>
-                </div>
-              </div>
-
-              {/* Mute toggle in alert */}
-              <button 
-                onClick={() => setIsMuted(!isMuted)}
-                className="absolute top-8 right-8 p-3 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400"
-              >
-                {isMuted ? <VolumeX /> : <Volume2 />}
-              </button>
-           </div>
-        </div>
-      )}
+      {/* Full Screen Alert Modal Removed — Moved to Inline View */}
 
       {/* Floating Audio Toggle when alert is not visible */}
       {!alertSOS && (

@@ -12,9 +12,11 @@ import {
   ArrowRight,
   TrendingUp,
   Package,
-  Clock
+  Clock,
+  Loader2
 } from "lucide-react";
 import useAuthStore from "@/store/auth.store";
+import api from "@/lib/api";
 
 const featureCards = [
   {
@@ -64,12 +66,27 @@ const featureCards = [
 export default function StudentDashboardPage() {
   const { user } = useAuthStore();
   const [greeting, setGreeting] = useState("Good morning");
+  const [activities, setActivities] = useState([]);
+  const [loadingActivities, setLoadingActivities] = useState(true);
 
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting("Good morning");
     else if (hour < 17) setGreeting("Good afternoon");
     else setGreeting("Good evening");
+
+    const fetchActivities = async () => {
+      try {
+        const { data } = await api.get("/api/notifications?limit=5");
+        setActivities(data.data || []);
+      } catch (err) {
+        console.error("Failed to fetch activities", err);
+      } finally {
+        setLoadingActivities(false);
+      }
+    };
+
+    fetchActivities();
   }, []);
 
   return (
@@ -153,26 +170,38 @@ export default function StudentDashboardPage() {
           <Link href="/student/notifications" className="text-sm text-blue-600 hover:underline font-medium">View All</Link>
         </div>
         <div className="divide-y divide-slate-100 dark:divide-slate-700">
-          {[1, 2, 3, 4, 5].map((_, i) => (
-            <div key={i} className="px-6 py-4 flex gap-4 items-start hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-              <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 shrink-0">
-                <Bell className="w-5 h-5" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-slate-800 dark:text-slate-200 font-medium">Activity update #{i + 1}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-slate-400">System Notification</span>
-                  <span className="text-[10px] text-slate-300">•</span>
-                  <span className="text-xs text-slate-400">{i + 1} hours ago</span>
+          {loadingActivities ? (
+            <div className="px-6 py-10 text-center text-slate-400">
+              <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin opacity-50" />
+              <p className="text-sm">Loading activity...</p>
+            </div>
+          ) : activities.length > 0 ? (
+            activities.map((act) => (
+              <div key={act._id} className="px-6 py-4 flex gap-4 items-start hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 shrink-0">
+                  <Bell className="w-5 h-5" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-slate-800 dark:text-slate-200 font-medium">{act.title}</p>
+                  <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{act.message}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-slate-400 capitalize">{act.type?.replace('_', ' ')}</span>
+                    <span className="text-[10px] text-slate-300">•</span>
+                    <span className="text-xs text-slate-400">
+                      {new Date(act.createdAt).toLocaleString(undefined, {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="px-6 py-10 text-center text-slate-400">
+               <Bell className="w-10 h-10 mx-auto mb-2 opacity-20" />
+               <p className="text-sm">No new activities to show</p>
             </div>
-          ))}
-          {/* Empty state placeholder if no activities */}
-          <div className="px-6 py-10 text-center text-slate-400">
-             <Bell className="w-10 h-10 mx-auto mb-2 opacity-20" />
-             <p className="text-sm">No new activities to show</p>
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -3,30 +3,47 @@ const RoommateRequest = require("../../models/RoommateRequest.model");
 const ChatRoom = require("../../models/ChatRoom.model");
 const User = require("../../models/User.model");
 const pushNotification = require("../../utils/pushNotification");
+const { getIo } = require("../../config/socket");
+const { roommateFollowupQueue } = require("../../jobs/roommate.followup");
 
-// Helper: Calculate Match Score
-const calculateScore = (my, their) => {
+// Helper: Calculate Match Score and Generate Generic Reasons
+const calculateScoreAndReasons = (my, their) => {
+  if (!my || !their) return { score: 0, reasons: [] };
   let score = 0;
+  const reasons = [];
 
-  // 1. BUDGET SCORE (max 30)
-  const diff = Math.abs(my.budget - their.budget);
-  if (diff <= 2000) score += 30;
-  else if (diff <= 5000) score += 15;
-
-  // 2. HABIT SCORE (max 40)
-  if (my.smoking === their.smoking) score += 15;
-  if (my.sleepSchedule === their.sleepSchedule) score += 15;
-  if (my.cleanliness === their.cleanliness) score += 10;
-
-  // 3. HOBBIES & DEPT (max 30)
-  if (my.department === their.department) score += 15;
+  // 1. BUDGET SCORE (max 40)
+  // Range overlap check
+  const myMin = my.budgetRange?.min || 0;
+  const myMax = my.budgetRange?.max || 0;
+  const theirMin = their.budgetRange?.min || 0;
+  const theirMax = their.budgetRange?.max || 0;
   
-  const myHobbies = my.hobbies.map(h => h.toLowerCase());
-  const theirHobbies = their.hobbies.map(h => h.toLowerCase());
-  const common = myHobbies.filter(h => theirHobbies.includes(h)).length;
-  score += Math.min(common * 5, 15);
+  if (myMax >= theirMin && myMin <= theirMax) {
+    score += 40;
+    reasons.push("Similar budget range");
+  } else if (Math.abs(myMax - theirMin) <= 1000 || Math.abs(theirMax - myMin) <= 1000) {
+    score += 20;
+    reasons.push("Close budget range");
+  }
 
-  return Math.min(score, 100);
+  // 2. DEPARTMENT SCORE (max 40)
+  if (my.department === their.department) {
+    score += 40;
+    reasons.push("Same department");
+  }
+
+  // 3. DURATION SCORE (max 20)
+  if (my.duration === their.duration) {
+    score += 20;
+    reasons.push("Looking for same duration");
+  }
+
+  if (score < 0) score = 0;
+  return {
+    score: Math.min(score, 100),
+    reasons
+  };
 };
 
 // Route 1: Create/Update Profile
@@ -51,7 +68,7 @@ exports.getMatches = async (req, res, next) => {
       return res.status(400).json({ success: false, error: "Create your profile first" });
     }
 
-    // Exclusion list: People I sent requests to or people who rejected me (or I rejected)
+    // Exclusion list
     const existingRequests = await RoommateRequest.find({
       $or: [{ senderId: req.user._id }, { receiverId: req.user._id }]
     });
@@ -61,24 +78,27 @@ exports.getMatches = async (req, res, next) => {
     );
     excludedIds.push(req.user._id.toString());
 
-    // Find other active profiles
+    // Find other active profiles of SAME GENDER
     const others = await RoommateProfile.find({
       userId: { $nin: excludedIds },
       isActive: true
     }).populate("userId", "name");
 
-    // Compute Scores
+    // Compute Scores and map to Privacy-Safe view
     const matches = others.map(profile => {
+      const matchResult = calculateScoreAndReasons(myProfile, profile);
       return {
         profileId: profile._id,
         userId: profile.userId._id,
         name: profile.userId.name,
         department: profile.department,
         year: profile.year,
-        budget: profile.budget,
+        location: profile.location,
         bio: profile.bio,
         hobbies: profile.hobbies,
-        score: calculateScore(myProfile, profile)
+        score: matchResult.score,
+        matchReasons: matchResult.reasons
+        // Notice we DO NOT send smokingPreference, cleanliness, sleepSchedule, budgetRange, dealBreakers
       };
     });
 
@@ -97,7 +117,6 @@ exports.sendRequest = async (req, res, next) => {
     const receiverId = req.params.userId;
     const senderId = req.user._id;
 
-    // Daily limit check (max 5 per day)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const dailyCount = await RoommateRequest.countDocuments({
@@ -109,7 +128,6 @@ exports.sendRequest = async (req, res, next) => {
       return res.status(429).json({ success: false, error: "Daily limit reached (5 requests/day)" });
     }
 
-    // Check no existing
     const existing = await RoommateRequest.findOne({
       $or: [
         { senderId, receiverId },
@@ -122,15 +140,14 @@ exports.sendRequest = async (req, res, next) => {
 
     const request = await RoommateRequest.create({ senderId, receiverId });
 
-    // Notify Receiver
     const senderProfile = await RoommateProfile.findOne({ userId: senderId });
     const receiverProfile = await RoommateProfile.findOne({ userId: receiverId });
-    const matchScore = calculateScore(senderProfile, receiverProfile);
+    const matchResult = calculateScoreAndReasons(senderProfile, receiverProfile);
 
     pushNotification(receiverId, {
       type: "roommate_request",
       title: "New Roommate Request! 🏠",
-      message: `${req.user.name} wants to be your roommate (Match: ${matchScore}%)`,
+      message: `${req.user.name} wants to be your roommate (Match: ${matchResult.score}%)`,
       link: "/student/roommate"
     });
 
@@ -151,7 +168,6 @@ exports.acceptRequest = async (req, res, next) => {
 
     request.status = "accepted";
 
-    // Create ChatRoom
     const chatRoom = await ChatRoom.create({
       participants: [request.senderId, request.receiverId],
       type: "roommate",
@@ -161,13 +177,19 @@ exports.acceptRequest = async (req, res, next) => {
     request.chatRoomId = chatRoom._id;
     await request.save();
 
-    // Notify Sender
     pushNotification(request.senderId, {
       type: "roommate_request",
       title: "Request Accepted! 🤝",
       message: `${req.user.name} accepted your roommate request. Start chatting!`,
       link: `/student/marketplace/chat/${chatRoom._id}`
     });
+
+    // Schedule 48-hour follow up
+    await roommateFollowupQueue.add(
+      "roommate-followup",
+      { chatRoomId: chatRoom._id },
+      { delay: 48 * 60 * 60 * 1000 } // 48 hours
+    );
 
     res.json({ success: true, chatRoomId: chatRoom._id });
   } catch (err) {
@@ -187,7 +209,6 @@ exports.rejectRequest = async (req, res, next) => {
     request.status = "rejected";
     await request.save();
 
-    // Notify Sender
     pushNotification(request.senderId, {
       type: "roommate_request",
       title: "Request Declined",
@@ -201,7 +222,7 @@ exports.rejectRequest = async (req, res, next) => {
   }
 };
 
-// Route 6: Get My Requests (Sent and Received)
+// Route 6: Get My Requests
 exports.getRequests = async (req, res, next) => {
   try {
     const userId = req.user._id;
@@ -214,41 +235,96 @@ exports.getRequests = async (req, res, next) => {
       .populate("receiverId", "name")
       .sort({ createdAt: -1 });
 
-    // For received, we need match score to show in UI
     const myProfile = await RoommateProfile.findOne({ userId });
-    
-    // Function to compute score locally for the response
-    const calculateLocalScore = (my, their) => {
-      if (!my || !their) return 0;
-      let score = 0;
-      const diff = Math.abs(my.budget - their.budget);
-      if (diff <= 2000) score += 30; else if (diff <= 5000) score += 15;
-      if (my.smoking === their.smoking) score += 15;
-      if (my.sleepSchedule === their.sleepSchedule) score += 15;
-      if (my.cleanliness === their.cleanliness) score += 10;
-      if (my.department === their.department) score += 15;
-      const myHobbies = my.hobbies.map(h => h.toLowerCase());
-      const theirHobbies = their.hobbies.map(h => h.toLowerCase());
-      const common = myHobbies.filter(h => theirHobbies.includes(h)).length;
-      score += Math.min(common * 5, 15);
-      return Math.min(score, 100);
+
+    // Format requests to only reveal full profile IF accepted
+    const formatRequests = async (requests, isReceived) => {
+      return Promise.all(requests.map(async (r) => {
+        const otherUserId = isReceived ? r.senderId._id : r.receiverId._id;
+        const otherProfile = await RoommateProfile.findOne({ userId: otherUserId });
+        const matchResult = calculateScoreAndReasons(myProfile, otherProfile);
+        
+        let profileData = null;
+
+        if (otherProfile) {
+          if (r.status === "accepted") {
+            // Full profile revealed!
+            profileData = {
+              department: otherProfile.department,
+              year: otherProfile.year,
+              bio: otherProfile.bio,
+              hobbies: otherProfile.hobbies,
+              budgetRange: otherProfile.budgetRange,
+              smokingPreference: otherProfile.smokingPreference,
+              sleepSchedule: otherProfile.sleepSchedule,
+              cleanliness: otherProfile.cleanliness,
+              dealBreakers: otherProfile.dealBreakers,
+              duration: otherProfile.duration
+            };
+          } else {
+            // Only safe fields revealed
+            profileData = {
+              department: otherProfile.department,
+              year: otherProfile.year,
+              bio: otherProfile.bio,
+              hobbies: otherProfile.hobbies
+            };
+          }
+        }
+
+        return {
+          ...r.toObject(),
+          matchScore: matchResult.score,
+          matchReasons: matchResult.reasons,
+          otherProfile: profileData
+        };
+      }));
     };
 
-    const receivedWithScores = await Promise.all(received.map(async (r) => {
-      const senderProfile = await RoommateProfile.findOne({ userId: r.senderId._id });
-      return {
-        ...r.toObject(),
-        matchScore: calculateLocalScore(myProfile, senderProfile)
-      };
-    }));
+    const receivedFormatted = await formatRequests(received, true);
+    const sentFormatted = await formatRequests(sent, false);
 
     res.json({
       success: true,
       data: {
-        received: receivedWithScores,
-        sent: sent
+        received: receivedFormatted,
+        sent: sentFormatted
       }
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route 8: Close Roommate Chat Manually
+exports.closeChat = async (req, res, next) => {
+  try {
+    const { roomId } = req.params;
+    const chatRoom = await ChatRoom.findById(roomId);
+
+    if (!chatRoom) {
+      return res.status(404).json({ success: false, error: "Chat not found" });
+    }
+
+    if (chatRoom.type !== "roommate") {
+      return res.status(400).json({ success: false, error: "Invalid chat type" });
+    }
+
+    if (!chatRoom.participants.includes(req.user._id)) {
+      return res.status(403).json({ success: false, error: "Unauthorized" });
+    }
+
+    chatRoom.isLocked = true;
+    chatRoom.dealStatus = "confirmed_sold"; // Reusing this for finalized status
+    await chatRoom.save();
+
+    const io = getIo();
+    io.to(`room:${chatRoom._id}`).emit("deal_status_update", {
+      chatRoomId: chatRoom._id,
+      dealStatus: "confirmed_sold"
+    });
+
+    res.json({ success: true, message: "Chat permanently closed." });
   } catch (err) {
     next(err);
   }

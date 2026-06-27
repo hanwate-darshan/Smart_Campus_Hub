@@ -59,7 +59,9 @@ export default function StudentLostFoundPage() {
 
     // Socket Setup
     const token = localStorage.getItem("accessToken");
-    socketRef.current = io(SOCKET_URL, { auth: { token } });
+    socketRef.current = io(SOCKET_URL, { 
+      auth: (cb) => cb({ token: localStorage.getItem("accessToken") })
+    });
 
     socketRef.current.on("item_now_in_office", (payload) => {
       toast.success(payload.message, { icon: '📦', duration: 6000 });

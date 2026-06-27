@@ -63,13 +63,22 @@ const registerSOSHandlers = (io, socket) => {
   // 4. Handle Security Location Update (from security)
   socket.on("security_location_update", async (payload) => {
     try {
-      const { coordinates } = payload; // [lng, lat]
+      const { coordinates, sosId } = payload; // [lng, lat]
       
       if (role === "security") {
         await User.findByIdAndUpdate(_id, {
           "lastLocation.type": "Point",
           "lastLocation.coordinates": coordinates
         });
+        
+        // Broadcast to student if security is handling an active SOS
+        if (sosId) {
+          io.to(`sos:${sosId}`).emit("security_location_update", {
+             securityId: _id,
+             coordinates,
+             timestamp: new Date()
+          });
+        }
         
         console.log(`[SOS] Updated security location: ${_id}`);
       }

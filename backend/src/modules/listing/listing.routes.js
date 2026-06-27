@@ -5,7 +5,9 @@ const {
   getListings, 
   getListingDetails, 
   updateListingStatus, 
-  markAsSold, 
+  claimSoldController,
+  confirmPurchaseController,
+  getMyListingsWithDealStatus,
   reportListing,
   checkDuplicateListing
 } = require("./listing.controller");
@@ -29,8 +31,10 @@ router.use(authenticate);
 router.post("/check-duplicate", requireRole("student"), checkDuplicateListing);
 router.post("/", requireRole("student"), upload.array("images", 3), validateCreateListing, createListing);
 router.get("/", requireRole("student", "admin"), cacheMiddleware, getListings);
+router.get("/mine/with-deal-status", requireRole("student"), getMyListingsWithDealStatus);
 router.get("/:id", requireRole("student", "admin"), getListingDetails);
-router.patch("/:id/sold", requireRole("student"), markAsSold);
+router.patch("/confirm-purchase", requireRole("student"), confirmPurchaseController);
+router.patch("/:id/claim-sold", requireRole("student"), claimSoldController);
 router.post("/:id/report", requireRole("student"), reportListing);
 
 // Admin Routes

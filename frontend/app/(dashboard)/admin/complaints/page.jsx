@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { 
-  ClipboardList, Search, Filter, AlertTriangle, X, 
-  MessageCircle, Send, Loader2, CheckCircle, Clock, AlertCircle
+  ClipboardList, Search, AlertTriangle, X, 
+  MessageCircle, Send, Loader2, CheckCircle, Clock, AlertCircle, ShieldAlert
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/lib/api";
@@ -30,14 +30,6 @@ const STATUSES = [
   { id: "closed", label: "Closed" }
 ];
 
-const VALID_TRANSITIONS = {
-  "submitted": ["in_review"],
-  "in_review": ["in_progress"],
-  "in_progress": ["resolved"],
-  "resolved": ["closed"],
-  "closed": []
-};
-
 const STATUS_BADGES = {
   submitted: "bg-blue-100 text-blue-700 border border-blue-200",
   in_review: "bg-amber-100 text-amber-700 border border-amber-200",
@@ -46,7 +38,7 @@ const STATUS_BADGES = {
   closed: "bg-slate-100 text-slate-700 border border-slate-200"
 };
 
-export default function TeacherComplaintsPage() {
+export default function AdminComplaintsPage() {
   const { user } = useAuthStore();
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,6 +47,7 @@ export default function TeacherComplaintsPage() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [search, setSearch] = useState("");
+  const [escalatedOnly, setEscalatedOnly] = useState(false);
   
   // Pagination
   const [page, setPage] = useState(1);
@@ -80,8 +73,8 @@ export default function TeacherComplaintsPage() {
     
     if (socketRef.current) {
       socketRef.current.on("notification_push", (data) => {
-        if (data.type === "new_complaint") {
-          toast.success("New Complaint: " + data.message);
+        if (data.type === "new_complaint" || data.type === "escalation") {
+          toast.success(data.title + ": " + data.message);
           fetchComplaints(1, true);
         } else if (data.type === "urgent_complaint") {
           setUrgentBanner(true);
@@ -129,19 +122,22 @@ export default function TeacherComplaintsPage() {
     }
   };
 
-  const handleUpdateStatus = async () => {
-    if (!newStatus) return;
+  const handleUpdateStatus = async (overrideStatus = null) => {
+    const targetStatus = overrideStatus || newStatus;
+    if (!targetStatus) return;
     setStatusProfanityError("");
     setUpdating(true);
     try {
       const { data } = await api.patch(`/api/complaints/${selectedComp._id}/status`, {
-        status: newStatus,
-        comment: statusComment
+        status: targetStatus,
+        comment: overrideStatus ? "Force closed by admin." : statusComment
       });
       toast.success("Status updated");
       setSelectedComp(data.data);
-      setStatusComment("");
-      setNewStatus("");
+      if (!overrideStatus) {
+        setStatusComment("");
+        setNewStatus("");
+      }
       setComplaints(prev => prev.map(c => c._id === data.data._id ? data.data : c));
     } catch (err) {
       if (err.response?.status === 400 && err.response?.data?.error?.includes("inappropriate language")) {
@@ -151,6 +147,12 @@ export default function TeacherComplaintsPage() {
       }
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handleForceClose = () => {
+    if (window.confirm("Are you sure you want to force close this complaint? This overrides all standard rules.")) {
+      handleUpdateStatus("closed");
     }
   };
 
@@ -177,7 +179,6 @@ export default function TeacherComplaintsPage() {
     }
   };
 
-  // Stats calculation from current view (approximate for demo)
   const stats = {
     submitted: complaints.filter(c => c.status === "submitted").length,
     in_progress: complaints.filter(c => c.status === "in_progress").length,
@@ -185,13 +186,18 @@ export default function TeacherComplaintsPage() {
     resolvedToday: complaints.filter(c => c.status === "resolved" && new Date(c.updatedAt).toDateString() === new Date().toDateString()).length,
   };
 
+  // Local filtering for escalated mode since there's no backend param explicitly for escalatedOnly
+  const displayedComplaints = escalatedOnly 
+    ? complaints.filter(c => c.escalatedAt)
+    : complaints;
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       
       {/* HEADER */}
       <div>
-        <h1 className="text-3xl font-black text-slate-800 dark:text-white">Complaint Management</h1>
-        <p className="text-slate-500 font-medium mt-1">Review, manage, and resolve student complaints.</p>
+        <h1 className="text-3xl font-black text-slate-800 dark:text-white">Admin Complaint Dashboard</h1>
+        <p className="text-slate-500 font-medium mt-1">Full control over all platform complaints.</p>
       </div>
 
       {/* URGENT BANNER */}
@@ -203,6 +209,22 @@ export default function TeacherComplaintsPage() {
           </div>
           <button onClick={() => setUrgentBanner(false)} className="bg-white/20 hover:bg-white/30 p-2 rounded-full transition-colors">
             <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* ESCALATED ALERT BOX */}
+      {stats.escalated > 0 && !escalatedOnly && (
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-4 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm animate-in fade-in">
+          <div className="flex items-center gap-3 text-amber-800 dark:text-amber-400">
+            <AlertTriangle className="w-6 h-6 shrink-0" />
+            <p className="font-bold">⚠️ {stats.escalated} complaints need immediate attention (48+ hours no action)</p>
+          </div>
+          <button 
+            onClick={() => setEscalatedOnly(true)}
+            className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl whitespace-nowrap transition-colors"
+          >
+            Review Now
           </button>
         </div>
       )}
@@ -248,21 +270,36 @@ export default function TeacherComplaintsPage() {
         >
           {STATUSES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
         </select>
+        
+        {/* ESCALATED ONLY TOGGLE */}
+        <button
+          onClick={() => setEscalatedOnly(!escalatedOnly)}
+          className={`px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 border transition-colors ${
+            escalatedOnly 
+              ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400" 
+              : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
+          }`}
+        >
+          <ShieldAlert className="w-5 h-5" /> Escalated Only
+          {stats.escalated > 0 && (
+            <span className="ml-1 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">{stats.escalated}</span>
+          )}
+        </button>
       </div>
 
       {/* COMPLAINT LIST */}
       <div className="space-y-4">
         {loading && page === 1 ? (
           <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>
-        ) : complaints.length === 0 ? (
+        ) : displayedComplaints.length === 0 ? (
           <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
             <ClipboardList className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h3 className="text-xl font-black text-slate-800 dark:text-white">No complaints found</h3>
           </div>
         ) : (
           <>
-            {complaints.map(comp => (
-              <div key={comp._id} className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center justify-between hover:border-blue-300 transition-all">
+            {displayedComplaints.map(comp => (
+              <div key={comp._id} className={`bg-white dark:bg-slate-800 p-5 rounded-2xl border shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center justify-between transition-all ${comp.escalatedAt ? 'border-red-200 dark:border-red-900/50 hover:border-red-300' : 'border-slate-100 dark:border-slate-700 hover:border-blue-300'}`}>
                 <div className="flex-1 w-full">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-[10px] font-black px-2.5 py-1 bg-slate-100 dark:bg-slate-700 rounded-md uppercase tracking-wider text-slate-600 dark:text-slate-300">
@@ -303,7 +340,7 @@ export default function TeacherComplaintsPage() {
                 </div>
               </div>
             ))}
-            {hasMore && (
+            {hasMore && !escalatedOnly && (
               <button 
                 onClick={() => fetchComplaints(page + 1)}
                 className="w-full py-3 bg-white dark:bg-slate-800 text-blue-600 font-bold rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm"
@@ -320,7 +357,7 @@ export default function TeacherComplaintsPage() {
         <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/50 backdrop-blur-sm">
           <div className="w-full max-w-xl bg-white dark:bg-slate-900 h-full overflow-y-auto animate-in slide-in-from-right duration-300 border-l border-slate-200 dark:border-slate-800">
             <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-10">
-              <h2 className="text-xl font-black text-slate-800 dark:text-white">Manage Complaint</h2>
+              <h2 className="text-xl font-black text-slate-800 dark:text-white">Admin Manage Complaint</h2>
               <button onClick={() => setSelectedComp(null)} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:text-slate-800">
                 <X className="w-5 h-5" />
               </button>
@@ -353,54 +390,63 @@ export default function TeacherComplaintsPage() {
                 </div>
               </div>
 
-              {/* SECTION 3: Update Status */}
-              {VALID_TRANSITIONS[selectedComp.status]?.length > 0 && (
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-2xl border border-blue-100 dark:border-blue-900/30">
-                  <h4 className="text-sm font-black text-blue-800 dark:text-blue-400 mb-4 flex items-center gap-2">
-                    <Clock className="w-4 h-4" /> Update Status
+              {/* SECTION 3: Update Status (ADMIN SEES ALL OPTIONS) */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-2xl border border-blue-100 dark:border-blue-900/30">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-sm font-black text-blue-800 dark:text-blue-400 flex items-center gap-2">
+                    <Clock className="w-4 h-4" /> Update Status (Admin Override)
                   </h4>
-                  <div className="space-y-4">
-                    <select 
-                      value={newStatus} 
-                      onChange={(e) => setNewStatus(e.target.value)}
-                      className="w-full bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3 font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
+                  {selectedComp.status !== "closed" && (
+                    <button 
+                      onClick={handleForceClose}
+                      className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 border border-red-300 rounded-lg text-xs font-bold transition-colors"
                     >
-                      <option value="">Select Next Status...</option>
-                      {VALID_TRANSITIONS[selectedComp.status].map(s => (
-                        <option key={s} value={s}>{s.replace("_", " ").toUpperCase()}</option>
-                      ))}
-                    </select>
-                    
-                    <div>
-                      <textarea 
-                        maxLength={500}
-                        value={statusComment}
-                        onChange={(e) => setStatusComment(e.target.value)}
-                        placeholder="Optional internal/public note about this status change..."
-                        className="w-full min-h-[80px] bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-                      />
-                      <div className="flex justify-between mt-1">
-                        <span className="text-[10px] font-bold text-slate-400">{statusComment.length}/500</span>
-                      </div>
-                      
-                      {/* ADD-ON 2 PROFANITY ERROR */}
-                      {statusProfanityError && (
-                        <div className="mt-2 bg-red-50 text-red-700 p-3 rounded-lg border border-red-200 text-xs font-bold flex items-start gap-2">
-                          <AlertCircle className="w-4 h-4 shrink-0" /> {statusProfanityError}
-                        </div>
-                      )}
+                      Force Close
+                    </button>
+                  )}
+                </div>
+                
+                <div className="space-y-4">
+                  <select 
+                    value={newStatus} 
+                    onChange={(e) => setNewStatus(e.target.value)}
+                    className="w-full bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3 font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Any Status...</option>
+                    {STATUSES.filter(s => s.id !== "").map(s => (
+                      <option key={s.id} value={s.id}>{s.label}</option>
+                    ))}
+                  </select>
+                  
+                  <div>
+                    <textarea 
+                      maxLength={500}
+                      value={statusComment}
+                      onChange={(e) => setStatusComment(e.target.value)}
+                      placeholder="Optional internal/public note about this status change..."
+                      className="w-full min-h-[80px] bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                    />
+                    <div className="flex justify-between mt-1">
+                      <span className="text-[10px] font-bold text-slate-400">{statusComment.length}/500</span>
                     </div>
                     
-                    <button 
-                      onClick={handleUpdateStatus}
-                      disabled={!newStatus || updating}
-                      className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-black rounded-xl shadow-lg shadow-blue-500/30 transition-all flex justify-center items-center gap-2"
-                    >
-                      {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />} Update
-                    </button>
+                    {/* ADD-ON 2 PROFANITY ERROR */}
+                    {statusProfanityError && (
+                      <div className="mt-2 bg-red-50 text-red-700 p-3 rounded-lg border border-red-200 text-xs font-bold flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 shrink-0" /> {statusProfanityError}
+                      </div>
+                    )}
                   </div>
+                  
+                  <button 
+                    onClick={() => handleUpdateStatus(null)}
+                    disabled={!newStatus || updating}
+                    className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-black rounded-xl shadow-lg shadow-blue-500/30 transition-all flex justify-center items-center gap-2"
+                  >
+                    {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />} Update
+                  </button>
                 </div>
-              )}
+              </div>
 
               {/* SECTION 4: Add Comment */}
               <div>

@@ -5,7 +5,8 @@ const {
   sendRequest, 
   acceptRequest, 
   rejectRequest,
-  getRequests
+  getRequests,
+  closeChat
 } = require("./roommate.controller");
 const { authenticate } = require("../../middleware/auth.middleware");
 const { requireRole } = require("../../middleware/role.middleware");
@@ -21,5 +22,6 @@ router.get("/requests", getRequests);
 router.post("/request/:userId", sendRequest);
 router.patch("/request/:id/accept", acceptRequest);
 router.patch("/request/:id/reject", rejectRequest);
+router.post("/close-chat/:roomId", closeChat);
 
 module.exports = router;

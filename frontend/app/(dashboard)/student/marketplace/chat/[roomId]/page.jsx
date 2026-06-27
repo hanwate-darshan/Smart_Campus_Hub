@@ -32,6 +32,7 @@ export default function ChatViewPage() {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [otherUserTyping, setOtherUserTyping] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const getLastActiveStatus = (lastActiveAt) => {
     if (!lastActiveAt) return null;
@@ -67,7 +68,9 @@ export default function ChatViewPage() {
 
     // Socket Setup
     const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-    socketRef.current = io(SOCKET_URL, { auth: { token } });
+    socketRef.current = io(SOCKET_URL, { 
+      auth: (cb) => cb({ token: localStorage.getItem("accessToken") })
+    });
 
     socketRef.current.emit("join_room", { roomId });
 
@@ -91,6 +94,28 @@ export default function ChatViewPage() {
           ...m,
           readBy: m.readBy?.includes(data.readBy) ? m.readBy : [...(m.readBy || []), data.readBy]
         })));
+      }
+    });
+
+    socketRef.current.on("deal_status_update", (data) => {
+      if (data.chatRoomId === roomId) {
+        setRoom(prev => ({ ...prev, dealStatus: data.dealStatus }));
+        if (data.dealStatus === 'confirmed_sold') {
+          setRoom(prev => ({ ...prev, isLocked: true }));
+        }
+      }
+    });
+
+    socketRef.current.on("deal_reminder", (data) => {
+      if (data.roomId === roomId) {
+        toast("Did you complete this deal? Check the chat for options.", { icon: '⏳', duration: 6000 });
+      }
+    });
+
+    socketRef.current.on("roommate_followup_ready", (data) => {
+      if (data.roomId === roomId) {
+        setRoom(prev => ({ ...prev, dealReminderNotifiedAt: new Date().toISOString() }));
+        toast("It has been 48 hours. Please let us know if you finalized the room.", { icon: '🏠', duration: 6000 });
       }
     });
 
@@ -139,26 +164,42 @@ export default function ChatViewPage() {
 
   const currentUserId = user?.id || user?._id;
   const isSeller = String(room?.listingSellerId) === String(currentUserId);
-  const showReminderBanner = room?.type === 'marketplace' && !room?.isLocked;
-  
-  console.log("Chat Banner Debug:", {
-    listingSellerId: room?.listingSellerId,
-    currentUserId,
-    isSeller,
-    type: room?.type,
-    isLocked: room?.isLocked,
-    status: room?.listingStatus,
-    showReminderBanner
-  });
+  const dealStatus = room?.dealStatus || "none";
 
-  const handleMarkAsSold = async () => {
+  const handleClaimSold = async () => {
     if (!room?.listingId) return;
     try {
-      await api.patch(`/api/listings/${room.listingId}/sold`);
-      toast.success("Listing marked as sold!");
-      setRoom(prev => ({ ...prev, isLocked: true, listingStatus: 'sold' }));
+      await api.patch(`/api/listings/${room.listingId}/claim-sold`, { chatRoomId: roomId });
+      toast.success("Waiting for buyer to confirm...");
+      setRoom(prev => ({ ...prev, dealStatus: 'pending_confirmation' }));
+      setShowConfirmModal(false);
     } catch (err) {
-      toast.error(err.response?.data?.error || "Failed to mark as sold");
+      toast.error(err.response?.data?.error || "Failed to claim sold");
+    }
+  };
+
+  const handleConfirmPurchase = async (confirmed) => {
+    try {
+      await api.patch(`/api/listings/confirm-purchase`, { chatRoomId: roomId, confirmed });
+      if (confirmed) {
+        toast.success("Purchase confirmed!");
+        setRoom(prev => ({ ...prev, dealStatus: 'confirmed_sold', isLocked: true }));
+      } else {
+        toast.success("Deal cancelled.");
+        setRoom(prev => ({ ...prev, dealStatus: 'deal_failed' }));
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to confirm purchase");
+    }
+  };
+
+  const handleCloseRoommateChat = async () => {
+    try {
+      await api.post(`/api/roommate/close-chat/${roomId}`);
+      toast.success("Chat permanently closed.");
+      setRoom(prev => ({ ...prev, dealStatus: 'confirmed_sold', isLocked: true }));
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to close chat");
     }
   };
 
@@ -200,9 +241,24 @@ export default function ChatViewPage() {
              </div>
           </div>
         </div>
-        <button className="p-2.5 text-slate-400">
-           <MoreVertical className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-3">
+          {isSeller && (dealStatus === "none" || dealStatus === "deal_failed") && !room?.isLocked && (
+            <button 
+              onClick={() => setShowConfirmModal(true)}
+              className="px-4 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 dark:text-emerald-400 font-bold text-xs rounded-xl flex items-center gap-1 transition-all"
+            >
+              <CheckCheck className="w-4 h-4" /> Mark as Sold
+            </button>
+          )}
+          {isSeller && dealStatus === "pending_confirmation" && (
+            <button disabled className="px-4 py-2 bg-slate-100 text-slate-500 font-bold text-xs rounded-xl flex items-center gap-1">
+              Waiting for buyer...
+            </button>
+          )}
+          <button className="p-2.5 text-slate-400">
+             <MoreVertical className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
       {/* --- SECURITY BANNER --- */}
@@ -214,28 +270,92 @@ export default function ChatViewPage() {
         </div>
       </div>
 
-      {/* --- DEAL REMINDER BANNER --- */}
-      {showReminderBanner && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/30 px-6 py-3 flex items-center justify-between gap-3">
+      {/* --- CONFIRMATION MODAL --- */}
+      {showConfirmModal && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm px-4">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100 dark:border-slate-700">
+            <h3 className="text-lg font-black text-slate-800 dark:text-white mb-2">Confirm Sale</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
+              Are you sure you sold this item to <span className="font-bold">{room?.otherParticipantName}</span>? They will need to confirm.
+            </p>
+            <div className="flex items-center gap-3 justify-end">
+              <button 
+                onClick={() => setShowConfirmModal(false)}
+                className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleClaimSold}
+                className="px-4 py-2 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl"
+              >
+                Yes, Mark as Sold
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- CONDITIONAL BANNERS --- */}
+      {!isSeller && dealStatus === "pending_confirmation" && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/30 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <Package className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
             <div>
-              <p className="text-sm font-bold text-blue-800 dark:text-blue-400">Did you complete this deal?</p>
-              <p className="text-xs font-medium text-blue-700/80 dark:text-blue-400/80 mt-0.5">
-                {isSeller 
-                  ? "If the item is handed over, please mark it as sold to close the listing."
-                  : "If you bought this item, please remind the seller to mark it as sold."}
-              </p>
+              <p className="text-sm font-bold text-blue-800 dark:text-blue-400">🛍️ The seller says you bought this item.</p>
+              <p className="text-xs font-medium text-blue-700/80 dark:text-blue-400/80 mt-0.5">Did this purchase happen?</p>
             </div>
           </div>
-          {isSeller && (
+          <div className="flex items-center gap-2 shrink-0">
             <button
-              onClick={handleMarkAsSold}
-              className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors shrink-0"
+              onClick={() => handleConfirmPurchase(false)}
+              className="px-4 py-2 border-2 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-xl transition-colors"
             >
-              Mark as Sold
+              No, this is wrong
             </button>
-          )}
+            <button
+              onClick={() => handleConfirmPurchase(true)}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition-colors"
+            >
+              Yes, I bought this
+            </button>
+          </div>
+        </div>
+      )}
+
+      {room?.type === "roommate" && room?.dealReminderNotifiedAt && !room?.isLocked && (
+        <div className="bg-emerald-50 dark:bg-emerald-900/20 border-b border-emerald-100 dark:border-emerald-900/30 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <User className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-bold text-emerald-800 dark:text-emerald-400">🏠 Automated Follow-up</p>
+              <p className="text-xs font-medium text-emerald-700/80 dark:text-emerald-400/80 mt-0.5">Have you finalized your roommate? If yes, securely close this chat.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={handleCloseRoommateChat}
+              className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition-colors"
+            >
+              Yes, Close Chat
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isSeller && dealStatus === "pending_confirmation" && (
+        <div className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-700/50 px-6 py-3 flex items-center justify-center">
+          <p className="text-sm font-bold text-slate-500 flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" /> Waiting for buyer to confirm the purchase...
+          </p>
+        </div>
+      )}
+
+      {dealStatus === "confirmed_sold" && (
+        <div className="bg-emerald-50 dark:bg-emerald-900/20 border-b border-emerald-100 dark:border-emerald-900/30 px-6 py-3 flex items-center justify-center">
+          <p className="text-sm font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+            ✅ This item has been sold. Chat is now closed.
+          </p>
         </div>
       )}
 
@@ -301,7 +421,11 @@ export default function ChatViewPage() {
              </div>
              <div>
                 <p className="text-sm font-black uppercase tracking-tight">This chat has been closed</p>
-                <p className="text-[10px] font-medium opacity-80">This item has been sold or removed by the seller.</p>
+                <p className="text-[10px] font-medium opacity-80">
+                  {room?.type === "roommate" 
+                    ? "This roommate connection is now permanently closed." 
+                    : "This item has been sold or removed by the seller."}
+                </p>
              </div>
           </div>
         ) : (

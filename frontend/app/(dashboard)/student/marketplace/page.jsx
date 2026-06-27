@@ -58,18 +58,19 @@ export default function MarketplacePage() {
   const fetchListings = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/api/listings", {
-        params: {
-          category: activeCategory || undefined,
-          search: search || undefined,
-          minPrice: minPrice || undefined,
-          maxPrice: maxPrice || undefined,
-          myListings: showMyListings
-        }
-      });
+      const endpoint = showMyListings ? "/api/listings/mine/with-deal-status" : "/api/listings";
+      const params = showMyListings ? {} : {
+        category: activeCategory || undefined,
+        search: search || undefined,
+        minPrice: minPrice || undefined,
+        maxPrice: maxPrice || undefined
+      };
+      
+      const { data } = await api.get(endpoint, { params });
       setListings(data.data);
     } catch (err) {
-      toast.error("Failed to load marketplace");
+      console.error("Marketplace load error:", err);
+      toast.error(err.response?.data?.error || err.message || "Failed to load marketplace");
     } finally {
       setLoading(false);
     }
@@ -90,17 +91,7 @@ export default function MarketplacePage() {
     }
   };
 
-  // 3. Mark as Sold Handler
-  const markAsSold = async (id) => {
-    try {
-      await api.patch(`/api/listings/${id}/sold`);
-      toast.success("Item marked as sold! Chats locked.");
-      setSelectedListing(null);
-      fetchListings();
-    } catch (err) {
-      toast.error(err.response?.data?.error || "Failed to mark as sold");
-    }
-  };
+  // 3. (Removed direct Mark as Sold, now must be done via Chat)
 
   // 4. Report Handler
   const reportItem = async (id) => {
@@ -213,6 +204,11 @@ export default function MarketplacePage() {
                       'bg-slate-500/90'
                     }`}>
                       {item.status.toUpperCase()}
+                    </span>
+                  )}
+                  {showMyListings && item.hasPendingConfirmation && (
+                    <span className="bg-amber-500/90 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+                      ⏳ SALE PENDING
                     </span>
                   )}
                 </div>
@@ -332,11 +328,10 @@ export default function MarketplacePage() {
 
                  {selectedListing.sellerId?._id === user?._id || selectedListing.sellerId === user?._id ? (
                    <button 
-                     onClick={() => markAsSold(selectedListing._id)}
-                     disabled={selectedListing.status === "sold"}
-                     className="w-full py-6 rounded-[2rem] bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-black text-xl transition-all shadow-2xl shadow-emerald-500/30 flex items-center justify-center gap-3 active:scale-[0.98]"
+                     disabled
+                     className="w-full py-6 rounded-[2rem] bg-slate-200 dark:bg-slate-800 text-slate-500 font-black text-xl transition-all flex items-center justify-center gap-3 cursor-not-allowed"
                    >
-                     <ShieldCheck className="w-7 h-7" /> {selectedListing.status === "sold" ? "ITEM SOLD" : "MARK AS SOLD"}
+                     <ShieldCheck className="w-7 h-7" /> {selectedListing.status === "sold" ? "ITEM SOLD" : "MARK SOLD IN CHAT"}
                    </button>
                  ) : (
                    <button 
