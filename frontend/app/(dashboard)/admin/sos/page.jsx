@@ -128,7 +128,7 @@ export default function AdminSOSPage() {
                       <div className="text-xs text-[#9aa0a6]">{sos.studentId?.phone || "No Phone"}</div>
                     </td>
                     <td className="px-6 py-4 text-sm text-[#e8eaed] capitalize">
-                      {sos.type.replace('_', ' ')}
+                      {sos.type ? sos.type.replace('_', ' ') : 'Unknown'}
                     </td>
                     <td className="px-6 py-4 text-sm text-[#9aa0a6] max-w-xs truncate" title={sos.locationDetails}>
                       {sos.locationDetails}

@@ -5,15 +5,11 @@ const pushNotification = require("../utils/pushNotification");
 const logger = require("../config/logger");
 const { getIo } = require("../config/socket");
 
-const REDIS_OPTIONS = {
-  connection: {
-    url: process.env.REDIS_URL
-  }
-};
+const createBullConnection = require("../config/bullConnection");
 
 const DEAL_REMINDER_QUEUE_NAME = "deal-reminder-check";
 
-const dealReminderQueue = new Queue(DEAL_REMINDER_QUEUE_NAME, REDIS_OPTIONS);
+const dealReminderQueue = new Queue(DEAL_REMINDER_QUEUE_NAME, { connection: createBullConnection() });
 
 const dealReminderWorker = new Worker(
   DEAL_REMINDER_QUEUE_NAME,
@@ -76,9 +72,7 @@ const dealReminderWorker = new Worker(
 
     logger.info(`[JOB] Deal reminder check completed. Sent ${notificationsSent} notifications.`);
     return notificationsSent;
-  },
-  REDIS_OPTIONS
-);
+  }, { connection: createBullConnection() });
 
 // Schedule the recurring job (every 4 hours as requested)
 const initDealReminderJob = async () => {

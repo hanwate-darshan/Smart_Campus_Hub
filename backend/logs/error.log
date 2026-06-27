@@ -538,3 +538,36 @@
 2026-06-26 22:04:22:422 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
 2026-06-26 22:04:27:427 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
 2026-06-26 22:04:27:427 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-27 13:03:26:326 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:03:26:326 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-27 13:16:39:1639 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:16:39:1639 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-27 13:19:54:1954 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:19:54:1954 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 13:19:55:1955 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:19:55:1955 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 13:20:08:208 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:20:08:208 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 13:20:09:209 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:20:09:209 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 13:21:22:2122 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:21:22:2122 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 13:21:23:2123 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:21:23:2123 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 16:06:22:622 [31merror[39m: [31m[JOB] Failed to emit socket event for room 6a3d47db87f118e8b6e016d6: getIo is not a function[39m
+2026-06-27 16:06:40:640 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 16:06:40:640 [31merror[39m: [31mread ECONNRESET[39m
+2026-06-27 16:06:40:640 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 16:06:40:640 [31merror[39m: [31m[31mread ECONNRESET[31m[39m

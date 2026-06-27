@@ -1,15 +1,11 @@
 const { Queue, Worker } = require("bullmq");
 const Listing = require("../models/Listing.model");
 
-const REDIS_OPTIONS = {
-  connection: {
-    url: process.env.REDIS_URL
-  }
-};
+const createBullConnection = require("../config/bullConnection");
 
 const EXPIRY_QUEUE_NAME = "marketplace-expiry";
 
-const expiryQueue = new Queue(EXPIRY_QUEUE_NAME, REDIS_OPTIONS);
+const expiryQueue = new Queue(EXPIRY_QUEUE_NAME, { connection: createBullConnection() });
 
 // The Worker logic
 const expiryWorker = new Worker(
@@ -34,9 +30,7 @@ const expiryWorker = new Worker(
 
     console.log(`[JOB] Expired ${result.modifiedCount} marketplace listings.`);
     return result.modifiedCount;
-  },
-  REDIS_OPTIONS
-);
+  }, { connection: createBullConnection() });
 
 // Schedule the recurring job (every day at midnight)
 const initExpiryJob = async () => {

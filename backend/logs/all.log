@@ -3344,3 +3344,195 @@
 2026-06-26 22:04:27:427 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
 2026-06-26 22:05:27:527 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
 2026-06-26 22:05:29:529 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-06-27 12:59:24:5924 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
+2026-06-27 12:59:26:5926 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-06-27 12:59:27:5927 [32minfo[39m: [32mServer running in development mode on port 5000[39m
+2026-06-27 12:59:27:5927 [32minfo[39m: [32m[JOB] Chat No-Response Auto-Check job scheduled (Every 6 hours).[39m
+2026-06-27 12:59:27:5927 [32minfo[39m: [32m[JOB] Marketplace Deal Reminder job scheduled (Every 4 hours).[39m
+2026-06-27 13:03:26:326 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:03:26:326 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-27 13:11:13:1113 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
+2026-06-27 13:11:16:1116 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-06-27 13:11:17:1117 [32minfo[39m: [32mServer running in development mode on port 5000[39m
+2026-06-27 13:11:18:1118 [32minfo[39m: [32m[JOB] Marketplace Deal Reminder job scheduled (Every 4 hours).[39m
+2026-06-27 13:11:18:1118 [32minfo[39m: [32m[JOB] Chat No-Response Auto-Check job scheduled (Every 6 hours).[39m
+2026-06-27 13:11:31:1131 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
+2026-06-27 13:11:32:1132 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-06-27 13:11:33:1133 [32minfo[39m: [32mServer running in development mode on port 5000[39m
+2026-06-27 13:11:33:1133 [32minfo[39m: [32m[JOB] Marketplace Deal Reminder job scheduled (Every 4 hours).[39m
+2026-06-27 13:11:33:1133 [32minfo[39m: [32m[JOB] Chat No-Response Auto-Check job scheduled (Every 6 hours).[39m
+2026-06-27 13:11:47:1147 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
+2026-06-27 13:11:49:1149 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-06-27 13:11:49:1149 [32minfo[39m: [32mServer running in development mode on port 5000[39m
+2026-06-27 13:11:49:1149 [32minfo[39m: [32m[JOB] Marketplace Deal Reminder job scheduled (Every 4 hours).[39m
+2026-06-27 13:11:50:1150 [32minfo[39m: [32m[JOB] Chat No-Response Auto-Check job scheduled (Every 6 hours).[39m
+2026-06-27 13:12:09:129 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
+2026-06-27 13:12:11:1211 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-06-27 13:12:11:1211 [32minfo[39m: [32mServer running in development mode on port 5000[39m
+2026-06-27 13:12:11:1211 [32minfo[39m: [32m[JOB] Chat No-Response Auto-Check job scheduled (Every 6 hours).[39m
+2026-06-27 13:12:11:1211 [32minfo[39m: [32m[JOB] Marketplace Deal Reminder job scheduled (Every 4 hours).[39m
+2026-06-27 13:12:41:1241 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
+2026-06-27 13:12:43:1243 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-06-27 13:12:43:1243 [32minfo[39m: [32mServer running in development mode on port 5000[39m
+2026-06-27 13:12:44:1244 [32minfo[39m: [32m[JOB] Chat No-Response Auto-Check job scheduled (Every 6 hours).[39m
+2026-06-27 13:12:44:1244 [32minfo[39m: [32m[JOB] Marketplace Deal Reminder job scheduled (Every 4 hours).[39m
+2026-06-27 13:16:39:1639 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:16:39:1639 [31merror[39m: [31mReached the max retries per request limit (which is 20). Refer to "maxRetriesPerRequest" option for details.[39m
+2026-06-27 13:18:43:1843 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
+2026-06-27 13:18:44:1844 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-06-27 13:18:45:1845 [32minfo[39m: [32mServer running in development mode on port 5000[39m
+2026-06-27 13:18:46:1846 [32minfo[39m: [32m[JOB] Chat No-Response Auto-Check job scheduled (Every 6 hours).[39m
+2026-06-27 13:18:49:1849 [32minfo[39m: [32m[JOB] Marketplace Deal Reminder job scheduled (Every 4 hours).[39m
+2026-06-27 13:19:20:1920 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
+2026-06-27 13:19:21:1921 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-06-27 13:19:21:1921 [32minfo[39m: [32mServer running in development mode on port 5000[39m
+2026-06-27 13:19:52:1952 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
+2026-06-27 13:19:54:1954 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-06-27 13:19:54:1954 [32minfo[39m: [32mServer running in development mode on port 5000[39m
+2026-06-27 13:19:54:1954 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:19:54:1954 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 13:19:55:1955 [32minfo[39m: [32m[JOB] Chat No-Response Auto-Check job scheduled (Every 6 hours).[39m
+2026-06-27 13:19:55:1955 [32minfo[39m: [32m[JOB] Marketplace Deal Reminder job scheduled (Every 4 hours).[39m
+2026-06-27 13:19:55:1955 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:19:55:1955 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 13:20:06:206 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
+2026-06-27 13:20:07:207 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-06-27 13:20:08:208 [32minfo[39m: [32mServer running in development mode on port 5000[39m
+2026-06-27 13:20:08:208 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:20:08:208 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 13:20:08:208 [32minfo[39m: [32m[JOB] Marketplace Deal Reminder job scheduled (Every 4 hours).[39m
+2026-06-27 13:20:08:208 [32minfo[39m: [32m[JOB] Chat No-Response Auto-Check job scheduled (Every 6 hours).[39m
+2026-06-27 13:20:09:209 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:20:09:209 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 13:21:20:2120 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
+2026-06-27 13:21:22:2122 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-06-27 13:21:22:2122 [32minfo[39m: [32mServer running in development mode on port 5000[39m
+2026-06-27 13:21:22:2122 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:21:22:2122 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 13:21:22:2122 [32minfo[39m: [32m[JOB] Marketplace Deal Reminder job scheduled (Every 4 hours).[39m
+2026-06-27 13:21:22:2122 [32minfo[39m: [32m[JOB] Chat No-Response Auto-Check job scheduled (Every 6 hours).[39m
+2026-06-27 13:21:23:2123 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 13:21:23:2123 [31merror[39m: [31mUsing a redis instance with enableReadyCheck or maxRetriesPerRequest for bclient/subscriber is not permitted.[39m
+[31m  see https://github.com/OptimalBits/bull/issues/1873[39m
+[31m  [39m
+2026-06-27 16:06:20:620 [32minfo[39m: [32m[JOB] Starting deal completion reminder check: repeat:052642c1bf9ff2ef36aab24b9c31b6d5:1782556200000[39m
+2026-06-27 16:06:22:622 [31merror[39m: [31m[JOB] Failed to emit socket event for room 6a3d47db87f118e8b6e016d6: getIo is not a function[39m
+2026-06-27 16:06:22:622 [32minfo[39m: [32m[JOB] Deal reminder check completed. Sent 2 notifications.[39m
+2026-06-27 16:06:40:640 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 16:06:40:640 [31merror[39m: [31mread ECONNRESET[39m
+2026-06-27 16:06:40:640 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 16:06:40:640 [31merror[39m: [31m[31mread ECONNRESET[31m[39m
+2026-06-27 16:15:43:1543 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:45:43 +0000] "POST /api/auth/refresh HTTP/1.1" 401 87 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:15:43:1543 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:45:43 +0000] "POST /api/auth/login HTTP/1.1" 500 68 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:15:45:1545 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:45:45 +0000] "POST /api/auth/login HTTP/1.1" 200 609 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:15:49:1549 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:45:49 +0000] "GET /api/notifications/unread-count HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:15:49:1549 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:45:49 +0000] "GET /api/notifications/unread-count HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:15:49:1549 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:45:49 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:15:49:1549 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:45:49 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:16:02:162 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:46:02 +0000] "GET /api/admin/users?limit=50 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:16:02:162 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:46:02 +0000] "GET /api/admin/users?limit=50 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:16:37:1637 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:46:37 +0000] "POST /api/admin/create-user HTTP/1.1" 201 395 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:16:37:1637 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:46:37 +0000] "GET /api/admin/users?limit=50 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:17:09:179 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:47:09 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:17:09:179 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:47:09 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:17:18:1718 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:47:18 +0000] "GET /api/lost-found HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:17:19:1719 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:47:19 +0000] "GET /api/lost-found HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:17:24:1724 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:47:24 +0000] "GET /api/sos/all HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:17:24:1724 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:47:24 +0000] "GET /api/sos/all HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:19:15:1915 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:49:15 +0000] "GET /api/sos/all HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:19:15:1915 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:49:15 +0000] "GET /api/notifications/unread-count HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:19:15:1915 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:49:15 +0000] "GET /api/notifications/unread-count HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:19:15:1915 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:49:15 +0000] "GET /api/sos/all HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:19:41:1941 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:49:41 +0000] "GET /api/listings?status=pending HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:19:41:1941 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:49:41 +0000] "GET /api/listings?status=pending HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:19:43:1943 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:49:43 +0000] "GET /api/listings?status=approved HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:19:44:1944 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:49:44 +0000] "GET /api/admin/users?status=suspended&role=student HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:19:45:1945 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:49:45 +0000] "GET /api/listings?status=pending HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:19:50:1950 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:49:50 +0000] "GET /api/complaints?page=1&limit=10 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:19:56:1956 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:49:56 +0000] "GET /api/admin/users?limit=50 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:19:56:1956 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:49:56 +0000] "GET /api/admin/users?limit=50 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:20:13:2013 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:50:13 +0000] "GET /api/admin/pending-users HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:20:13:2013 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:50:13 +0000] "GET /api/admin/pending-users HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:20:16:2016 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:50:16 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:20:16:2016 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:50:16 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:20:19:2019 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:50:19 +0000] "GET /api/notifications?page=1&limit=20 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:20:19:2019 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:50:19 +0000] "GET /api/notifications?page=1&limit=20 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:05:225 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:05 +0000] "PATCH /api/notifications/mark-all-read HTTP/1.1" 200 33 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:06:226 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:06 +0000] "GET /api/notifications/unread-count HTTP/1.1" 200 26 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:09:229 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:09 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:09:229 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:09 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:14:2214 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:14 +0000] "GET /api/admin/pending-users HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:14:2214 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:14 +0000] "GET /api/admin/pending-users HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:16:2216 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:16 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:17:2217 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:17 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:23:2223 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:23 +0000] "GET /api/notifications?page=1&limit=20 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:23:2223 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:23 +0000] "GET /api/notifications?page=1&limit=20 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:34:2234 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:34 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:34:2234 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:34 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:40:2240 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:40 +0000] "GET /api/lost-found HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:40:2240 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:40 +0000] "GET /api/lost-found HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:43:2243 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:43 +0000] "GET /api/lost-found?status=pending HTTP/1.1" 200 71 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:44:2244 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:44 +0000] "GET /api/lost-found?status=in_office HTTP/1.1" 200 71 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:22:45:2245 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:52:45 +0000] "GET /api/lost-found?status=returned HTTP/1.1" 200 528 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:23:01:231 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:53:01 +0000] "GET /api/sos/all HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:23:01:231 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:53:01 +0000] "GET /api/sos/all HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:23:06:236 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:53:06 +0000] "GET /api/sos/all HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:23:07:237 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:53:07 +0000] "GET /api/sos/all HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:23:08:238 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:53:08 +0000] "GET /api/sos/all HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:23:14:2314 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:53:14 +0000] "GET /api/listings?status=pending HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:23:14:2314 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:53:14 +0000] "GET /api/listings?status=pending HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:23:15:2315 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:53:15 +0000] "GET /api/listings?status=approved HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:23:16:2316 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:53:16 +0000] "GET /api/admin/users?status=suspended&role=student HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:23:21:2321 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:53:21 +0000] "GET /api/complaints?page=1&limit=10 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:23:38:2338 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:53:38 +0000] "PATCH /api/complaints/6a3e54d63964f8777ebf582e/status HTTP/1.1" 200 695 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:15:2415 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:15 +0000] "POST /api/complaints/6a3e54d63964f8777ebf582e/comment HTTP/1.1" 200 894 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:24:2424 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:24 +0000] "GET /api/admin/users?limit=50 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:24:2424 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:24 +0000] "GET /api/admin/users?limit=50 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:32:2432 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:32 +0000] "GET /api/admin/pending-users HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:32:2432 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:32 +0000] "GET /api/admin/pending-users HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:34:2434 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:34 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:34:2434 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:34 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:41:2441 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:41 +0000] "GET /api/admin/pending-users HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:41:2441 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:41 +0000] "GET /api/admin/pending-users HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:43:2443 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:43 +0000] "GET /api/complaints?page=1&limit=10 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:44:2444 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:44 +0000] "GET /api/admin/users?limit=50 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:44:2444 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:44 +0000] "GET /api/admin/users?limit=50 HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:44:2444 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:44 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:24:44:2444 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:54:44 +0000] "GET /api/admin/dashboard-stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:25:05:255 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:55:05 +0000] "POST /api/auth/login HTTP/1.1" 200 614 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:25:08:258 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:55:08 +0000] "GET /api/notifications/unread-count HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:25:08:258 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:55:08 +0000] "GET /api/notifications/unread-count HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:25:08:258 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:55:08 +0000] "GET /api/complaints/stats HTTP/1.1" 200 825 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:25:09:259 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:55:09 +0000] "GET /api/complaints/stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:25:16:2516 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:55:16 +0000] "GET /api/complaints?page=1&limit=10 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:25:31:2531 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:55:31 +0000] "PATCH /api/complaints/6a3e54d63964f8777ebf582e/status HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:25:37:2537 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:55:37 +0000] "POST /api/complaints/6a3e54d63964f8777ebf582e/comment HTTP/1.1" 200 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:25:49:2549 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:55:49 +0000] "GET /api/complaints/stats HTTP/1.1" 200 825 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:25:49:2549 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:55:49 +0000] "GET /api/complaints/stats HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:26:32:2632 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:56:32 +0000] "POST /api/auth/login HTTP/1.1" 200 608 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:27:19:2719 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:57:19 +0000] "GET /api/notifications/unread-count HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:27:19:2719 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:57:19 +0000] "GET /api/notifications/unread-count HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:27:25:2725 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:57:25 +0000] "PATCH /api/security/status HTTP/1.1" 200 78 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:27:25:2725 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:57:25 +0000] "GET /api/notifications/unread-count HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:27:26:2726 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:57:26 +0000] "PATCH /api/security/status HTTP/1.1" 200 81 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:27:27:2727 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:57:27 +0000] "GET /api/notifications/unread-count HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:27:46:2746 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:57:46 +0000] "GET /api/notifications?page=1&limit=20 HTTP/1.1" 200 71 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:27:47:2747 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:57:47 +0000] "GET /api/notifications?page=1&limit=20 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:28:04:284 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:58:04 +0000] "GET /api/security/profile HTTP/1.1" 200 355 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:28:04:284 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:58:04 +0000] "GET /api/security/profile HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:28:19:2819 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:58:19 +0000] "PATCH /api/security/status HTTP/1.1" 200 83 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:28:19:2819 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:58:19 +0000] "GET /api/notifications/unread-count HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:28:20:2820 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:58:20 +0000] "PATCH /api/security/status HTTP/1.1" 429 93 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:28:23:2823 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:58:23 +0000] "PATCH /api/security/status HTTP/1.1" 429 93 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:28:38:2838 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:58:38 +0000] "GET /api/notifications?page=1&limit=20 HTTP/1.1" 429 93 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m
+2026-06-27 16:28:38:2838 [32minfo[39m: [32m::1 - - [27/Jun/2026:10:58:38 +0000] "GET /api/notifications?page=1&limit=20 HTTP/1.1" 429 93 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"[39m

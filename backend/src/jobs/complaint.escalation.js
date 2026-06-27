@@ -5,8 +5,12 @@ const pushNotification = require("../utils/pushNotification");
 const { sendEmail } = require("../utils/email.utils");
 const logger = require("../config/logger");
 
-const escalationQueue = new Bull("complaint-escalation", process.env.REDIS_URL || "redis://127.0.0.1:6379");
-
+const createBullConnection = require("../config/bullConnection");
+const escalationQueue = new Bull("complaint-escalation", {
+  createClient: function (type) {
+    return createBullConnection();
+  }
+});
 escalationQueue.process(async (job) => {
   try {
     const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000); // 48 hours ago

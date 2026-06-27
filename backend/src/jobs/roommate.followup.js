@@ -5,15 +5,11 @@ const pushNotification = require("../utils/pushNotification");
 const logger = require("../config/logger");
 const { getIo } = require("../config/socket");
 
-const REDIS_OPTIONS = {
-  connection: {
-    url: process.env.REDIS_URL
-  }
-};
+const createBullConnection = require("../config/bullConnection");
 
 const ROOMMATE_FOLLOWUP_QUEUE_NAME = "roommate-followup-queue";
 
-const roommateFollowupQueue = new Queue(ROOMMATE_FOLLOWUP_QUEUE_NAME, REDIS_OPTIONS);
+const roommateFollowupQueue = new Queue(ROOMMATE_FOLLOWUP_QUEUE_NAME, { connection: createBullConnection() });
 
 const roommateFollowupWorker = new Worker(
   ROOMMATE_FOLLOWUP_QUEUE_NAME,
@@ -62,9 +58,7 @@ const roommateFollowupWorker = new Worker(
 
     logger.info(`[JOB] Roommate followup check completed for chat: ${chatRoomId}`);
     return;
-  },
-  REDIS_OPTIONS
-);
+  }, { connection: createBullConnection() });
 
 module.exports = {
   roommateFollowupQueue

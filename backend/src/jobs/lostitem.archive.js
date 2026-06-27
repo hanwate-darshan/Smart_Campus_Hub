@@ -1,15 +1,11 @@
 const { Queue, Worker, QueueEvents } = require("bullmq");
 const LostItem = require("../models/LostItem.model");
 
-const REDIS_OPTIONS = {
-  connection: {
-    url: process.env.REDIS_URL
-  }
-};
+const createBullConnection = require("../config/bullConnection");
 
 const ARCHIVE_QUEUE_NAME = "lost-found-archive";
 
-const archiveQueue = new Queue(ARCHIVE_QUEUE_NAME, REDIS_OPTIONS);
+const archiveQueue = new Queue(ARCHIVE_QUEUE_NAME, { connection: createBullConnection() });
 
 // The Worker logic
 const archiveWorker = new Worker(
@@ -36,9 +32,7 @@ const archiveWorker = new Worker(
 
     console.log(`[JOB] Archived ${result.modifiedCount} items.`);
     return result.modifiedCount;
-  },
-  REDIS_OPTIONS
-);
+  }, { connection: createBullConnection() });
 
 // Schedule the recurring job (every day at midnight)
 const initArchiveJob = async () => {

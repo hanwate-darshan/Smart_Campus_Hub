@@ -4,15 +4,11 @@ const Message = require("../models/Message.model");
 const pushNotification = require("../utils/pushNotification");
 const logger = require("../config/logger");
 
-const REDIS_OPTIONS = {
-  connection: {
-    url: process.env.REDIS_URL
-  }
-};
+const createBullConnection = require("../config/bullConnection");
 
 const NO_RESPONSE_QUEUE_NAME = "chat-no-response-check";
 
-const noResponseQueue = new Queue(NO_RESPONSE_QUEUE_NAME, REDIS_OPTIONS);
+const noResponseQueue = new Queue(NO_RESPONSE_QUEUE_NAME, { connection: createBullConnection() });
 
 const noResponseWorker = new Worker(
   NO_RESPONSE_QUEUE_NAME,
@@ -58,9 +54,7 @@ const noResponseWorker = new Worker(
 
     logger.info(`[JOB] Chat no-response check completed. Sent ${notificationsSent} notifications.`);
     return notificationsSent;
-  },
-  REDIS_OPTIONS
-);
+  }, { connection: createBullConnection() });
 
 // Schedule the recurring job (every 6 hours)
 const initNoResponseJob = async () => {
