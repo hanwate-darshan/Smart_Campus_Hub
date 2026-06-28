@@ -74,4 +74,12 @@ router.post(
   complaintController.addComment
 );
 
+// DELETE /:id
+router.delete(
+  "/:id",
+  authenticate,
+  requireRole("admin"),
+  complaintController.deleteComplaint
+);
+
 module.exports = router;

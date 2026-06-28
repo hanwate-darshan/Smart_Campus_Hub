@@ -31,9 +31,9 @@ const STATUSES = [
 ];
 
 const VALID_TRANSITIONS = {
-  "submitted": ["in_review"],
-  "in_review": ["in_progress"],
-  "in_progress": ["resolved"],
+  "submitted": ["in_review", "in_progress", "resolved", "closed"],
+  "in_review": ["in_progress", "resolved", "closed"],
+  "in_progress": ["resolved", "closed"],
   "resolved": ["closed"],
   "closed": []
 };

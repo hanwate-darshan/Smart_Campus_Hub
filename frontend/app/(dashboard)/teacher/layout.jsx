@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import RoleGuard from "@/components/shared/RoleGuard";
 import useAuthStore from "@/store/auth.store";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import api from "@/lib/api";
+import { getNamespace } from "@/config/socket";
 
 const navLinks = [
   { name: "Dashboard", href: "/teacher/dashboard", icon: "📊" },
@@ -21,6 +23,34 @@ export default function TeacherLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const { user, clearAuth } = useAuthStore();
+  const [pendingComplaintsCount, setPendingComplaintsCount] = useState(0);
+
+  const fetchStats = async () => {
+    try {
+      if (!user) return;
+      const { data } = await api.get("/api/complaints/stats");
+      setPendingComplaintsCount(data.data.pending);
+    } catch (err) {
+      console.error("Failed to fetch complaint stats", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+    
+    if (!user) return;
+    const notificationsNs = getNamespace("/notifications");
+    
+    const handleCountUpdate = () => {
+      fetchStats();
+    };
+    
+    notificationsNs.on("complaint_count_update", handleCountUpdate);
+    
+    return () => {
+      notificationsNs.off("complaint_count_update", handleCountUpdate);
+    };
+  }, [user]);
 
   const handleLogout = () => {
     clearAuth();
@@ -67,6 +97,11 @@ export default function TeacherLayout({ children }) {
                 >
                   <span className="text-base w-5 text-center">{link.icon}</span>
                   <span className="flex-1">{link.name}</span>
+                  {link.name === "Complaints" && pendingComplaintsCount > 0 && (
+                    <span className="bg-[#f28b82] text-[#131314] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                      {pendingComplaintsCount > 99 ? "99+" : pendingComplaintsCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

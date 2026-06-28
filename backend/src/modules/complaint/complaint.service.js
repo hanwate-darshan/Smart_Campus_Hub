@@ -3,7 +3,7 @@ const User = require("../../models/User.model");
 const pushNotification = require("../../utils/pushNotification");
 const { sendEmail } = require("../../utils/email.utils");
 const { containsProfanity } = require("../../utils/profanityFilter");
-const { getIo } = require("../../config/socket");
+const { getIO } = require("../../config/socket");
 const logger = require("../../config/logger");
 
 // ─────────────────────────────────────
@@ -96,21 +96,31 @@ const createComplaint = async ({ studentId, title, description, category, isAnon
 
   // Step 5 & 6: Notify Admins & Teachers
   try {
-    const io = getIo();
+    const io = getIO();
     if (category === "ragging") {
-      io.to("admin:room").emit("notification_push", {
-        type: "urgent_complaint",
-        title: "URGENT: Ragging Complaint",
-        message: "A ragging complaint has been submitted. Immediate attention required.",
-        link: "/admin/complaints"
+      const admins = await User.find({ role: "admin" }).select("_id");
+      admins.forEach(admin => {
+        pushNotification(admin._id, {
+          type: "urgent_complaint",
+          title: "URGENT: Ragging Complaint",
+          message: "A ragging complaint has been submitted. Immediate attention required.",
+          link: "/admin/complaints"
+        });
       });
     }
-    io.to("teacher:room").emit("notification_push", {
-      type: "new_complaint",
-      title: "New Complaint",
-      message: `${category} — ${title}`,
-      link: "/teacher/complaints"
+    
+    const teachers = await User.find({ role: "teacher" }).select("_id");
+    teachers.forEach(teacher => {
+      pushNotification(teacher._id, {
+        type: "new_complaint",
+        title: "New Complaint",
+        message: `${category} — ${title}`,
+        link: "/teacher/complaints"
+      });
     });
+
+    // Trigger sidebar count refresh
+    io.of("/notifications").to("teacher:room").emit("complaint_count_update");
   } catch (err) {
     logger.error("Failed to emit complaint socket notification", err);
   }
@@ -220,9 +230,9 @@ const updateComplaintStatus = async ({ complaintId, newStatus, comment, updatedB
   // Validate transitions unless admin
   if (updatedByRole !== "admin") {
     const validTransitions = {
-      "submitted": ["in_review"],
-      "in_review": ["in_progress"],
-      "in_progress": ["resolved"],
+      "submitted": ["in_review", "in_progress", "resolved", "closed"],
+      "in_review": ["in_progress", "resolved", "closed"],
+      "in_progress": ["resolved", "closed"],
       "resolved": ["closed"],
       "closed": []
     };
@@ -293,13 +303,27 @@ const addComment = async ({ complaintId, authorId, authorRole, authorName, text 
 
   await complaint.save();
 
-  if (!complaint.isAnonymous) {
-    pushNotification(complaint.studentId, {
-      type: "complaint_comment",
-      title: "New Response",
-      message: `${authorName} added a response`,
-      link: "/student/complaints"
+  if (authorRole === "student") {
+    // Notify teachers when student replies
+    const teachers = await User.find({ role: "teacher" }).select("_id");
+    teachers.forEach(teacher => {
+      pushNotification(teacher._id, {
+        type: "complaint_comment",
+        title: "Student Replied",
+        message: `${complaint.isAnonymous ? 'Anonymous Student' : authorName} added a response to a complaint`,
+        link: "/teacher/complaints"
+      });
     });
+  } else {
+    // Notify student when teacher/admin replies
+    if (!complaint.isAnonymous) {
+      pushNotification(complaint.studentId, {
+        type: "complaint_comment",
+        title: "New Response",
+        message: `${authorName} added a response to your complaint`,
+        link: "/student/complaints"
+      });
+    }
   }
 
   return complaint;
@@ -362,6 +386,19 @@ const getComplaintStats = async () => {
   };
 };
 
+// ─────────────────────────────────────
+// FUNCTION 9: deleteComplaint
+// ─────────────────────────────────────
+const deleteComplaint = async (complaintId) => {
+  const complaint = await Complaint.findByIdAndDelete(complaintId);
+  if (!complaint) {
+    const err = new Error("Complaint not found");
+    err.status = 404;
+    throw err;
+  }
+  return complaint;
+};
+
 module.exports = {
   checkSimilarComplaints,
   createComplaint,
@@ -370,5 +407,6 @@ module.exports = {
   updateComplaintStatus,
   addComment,
   getComplaintById,
-  getComplaintStats
+  getComplaintStats,
+  deleteComplaint
 };

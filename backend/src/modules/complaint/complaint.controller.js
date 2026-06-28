@@ -170,3 +170,16 @@ exports.getStats = async (req, res) => {
     return res.status(500).json({ success: false, error: "Server error" });
   }
 };
+
+exports.deleteComplaint = async (req, res) => {
+  try {
+    await complaintService.deleteComplaint(req.params.id);
+    return res.status(200).json({ success: true, message: "Complaint deleted successfully." });
+  } catch (err) {
+    if (err.status === 404) {
+      return res.status(404).json({ success: false, error: err.message });
+    }
+    logger.error("Error in deleteComplaint controller", err);
+    return res.status(500).json({ success: false, error: "Server error" });
+  }
+};

@@ -64,6 +64,35 @@ export default function SecurityDashboardPage() {
   useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
   useEffect(() => { alertSOSRef.current = alertSOS; }, [alertSOS]);
 
+  // Fetch existing active SOS on mount (in case of page refresh)
+  useEffect(() => {
+    const fetchActiveSOS = async () => {
+      try {
+        const { data } = await api.get("/api/sos/active");
+        if (data.success && data.data.length > 0) {
+          const assignedToMe = data.data.find(
+            sos => sos.assignedSecurityId?._id === user?._id && ["assigned", "reached"].includes(sos.status)
+          );
+          if (assignedToMe) {
+            setActiveSOS({
+              sosId: assignedToMe._id,
+              studentName: assignedToMe.studentId?.name || "Student",
+              studentPhone: assignedToMe.studentId?.phone || "N/A",
+              location: assignedToMe.location,
+              status: assignedToMe.status
+            });
+            setDutyStatus("busy");
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch active SOS", err);
+      }
+    };
+    if (user?._id) {
+      fetchActiveSOS();
+    }
+  }, [user?._id]);
+
   // Refs
   const socketRef = useRef(null);
   const audioRef = useRef(null);
@@ -85,6 +114,9 @@ export default function SecurityDashboardPage() {
     socketRef.current.on("connect", () => {
       console.log("[Security Socket] Connected");
       socketRef.current.emit("join", "security:pool");
+      if (activeSOSRef.current?.sosId) {
+        socketRef.current.emit("join", `sos:${activeSOSRef.current.sosId}`);
+      }
     });
 
     // Listen for new SOS alerts — read from refs to avoid stale closure
@@ -135,7 +167,7 @@ export default function SecurityDashboardPage() {
     socketRef.current.on("sos_cancelled", (payload) => {
       if (alertSOSRef.current && alertSOSRef.current.sosId === payload.sosId) {
         setAlertSOS(null);
-        audioRef.current.pause();
+        if (audioRef.current) audioRef.current.pause();
         toast.error("SOS was cancelled by student");
       }
       if (activeSOSRef.current && activeSOSRef.current.sosId === payload.sosId) {
@@ -168,6 +200,13 @@ export default function SecurityDashboardPage() {
       if (watchIdRef.current) navigator.geolocation.clearWatch(watchIdRef.current);
     };
   }, []); // ← Empty deps: socket initializes once, refs keep values fresh
+
+  // Ensure socket joins specific SOS room when activeSOS changes
+  useEffect(() => {
+    if (activeSOS?.sosId && socketRef.current?.connected) {
+      socketRef.current.emit("join", `sos:${activeSOS.sosId}`);
+    }
+  }, [activeSOS?.sosId]);
 
   const startGuardTracking = () => {
     if (navigator.geolocation) {
@@ -374,11 +413,17 @@ export default function SecurityDashboardPage() {
             </div>
             
             <div className="flex-1 bg-slate-200 relative overflow-hidden">
-               {activeSOS.location?.coordinates && (
+               {activeSOS?.location?.coordinates && activeSOS.location.coordinates.length === 2 ? (
                  <LiveMap 
                    studentLocation={activeSOS.location.coordinates} 
                    guardLocation={guardLocation} 
                  />
+               ) : (
+                 <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 p-6 text-center">
+                   <AlertCircle className="w-12 h-12 mb-4 text-orange-500 animate-pulse" />
+                   <p className="text-lg font-bold">Waiting for student location...</p>
+                   <p className="text-sm mt-2 opacity-70">The student's device has not provided GPS coordinates yet.</p>
+                 </div>
                )}
                
                <div className="absolute top-6 left-6 right-6 flex items-start justify-between pointer-events-none z-10">

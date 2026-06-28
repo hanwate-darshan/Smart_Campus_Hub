@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   ClipboardList, Search, AlertTriangle, X, 
-  MessageCircle, Send, Loader2, CheckCircle, Clock, AlertCircle, ShieldAlert
+  MessageCircle, Send, Loader2, CheckCircle, Clock, AlertCircle, ShieldAlert, Trash2
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/lib/api";
@@ -153,6 +153,19 @@ export default function AdminComplaintsPage() {
   const handleForceClose = () => {
     if (window.confirm("Are you sure you want to force close this complaint? This overrides all standard rules.")) {
       handleUpdateStatus("closed");
+    }
+  };
+
+  const handleDeleteComplaint = async () => {
+    if (window.confirm("Are you sure you want to delete this complaint permanently? This action cannot be undone.")) {
+      try {
+        await api.delete(`/api/complaints/${selectedComp._id}`);
+        toast.success("Complaint deleted successfully");
+        setComplaints(prev => prev.filter(c => c._id !== selectedComp._id));
+        setSelectedComp(null);
+      } catch (err) {
+        toast.error("Failed to delete complaint");
+      }
     }
   };
 
@@ -358,9 +371,18 @@ export default function AdminComplaintsPage() {
           <div className="w-full max-w-xl bg-white dark:bg-slate-900 h-full overflow-y-auto animate-in slide-in-from-right duration-300 border-l border-slate-200 dark:border-slate-800">
             <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-10">
               <h2 className="text-xl font-black text-slate-800 dark:text-white">Admin Manage Complaint</h2>
-              <button onClick={() => setSelectedComp(null)} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:text-slate-800">
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handleDeleteComplaint} 
+                  className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-full transition-colors"
+                  title="Delete Complaint"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+                <button onClick={() => setSelectedComp(null)} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:text-slate-800">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
             
             <div className="p-6 space-y-8">

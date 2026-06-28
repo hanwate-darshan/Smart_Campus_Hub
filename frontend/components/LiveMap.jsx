@@ -23,11 +23,21 @@ export default function LiveMap({ studentLocation, guardLocation }) {
     const isStudentValid = sLat !== 0 && sLng !== 0;
 
     if (guardLocation && isStudentValid) {
-      const bounds = L.latLngBounds(
-        [sLat, sLng],
-        [guardLocation[1], guardLocation[0]]
-      );
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 17 });
+      const gLat = guardLocation[1];
+      const gLng = guardLocation[0];
+      
+      // Check if coordinates are nearly identical (e.g., testing on same machine)
+      const isSameLocation = Math.abs(sLat - gLat) < 0.0001 && Math.abs(sLng - gLng) < 0.0001;
+      
+      if (isSameLocation) {
+        map.setView([sLat, sLng], 17);
+      } else {
+        const bounds = L.latLngBounds(
+          [sLat, sLng],
+          [gLat, gLng]
+        );
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 17 });
+      }
     } else if (guardLocation && !isStudentValid) {
       map.setView([guardLocation[1], guardLocation[0]], 17);
     } else if (isStudentValid) {
