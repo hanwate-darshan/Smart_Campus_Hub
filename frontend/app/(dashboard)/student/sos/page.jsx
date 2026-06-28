@@ -10,7 +10,8 @@ import {
   CheckCircle2, 
   ShieldAlert,
   Loader2,
-  Navigation
+  Navigation,
+  Phone
 } from "lucide-react";
 import { io } from "socket.io-client";
 import toast from "react-hot-toast";
@@ -69,6 +70,44 @@ export default function StudentSOSPage() {
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
       if (locationUpdateIntervalRef.current) clearInterval(locationUpdateIntervalRef.current);
     };
+  }, []);
+
+  // 1.5 CHECK FOR EXISTING ACTIVE SOS ON MOUNT
+  useEffect(() => {
+    const checkExisting = async () => {
+      try {
+        const { data } = await api.get("/api/sos/my-history");
+        if (data.success && data.data.length > 0) {
+          const latest = data.data[0];
+          const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+          const isRecent = new Date(latest.createdAt) > twoHoursAgo;
+          
+          if (["active", "assigned", "reached"].includes(latest.status) && isRecent) {
+            setActiveSOS({
+              _id: latest._id,
+              status: latest.status,
+              securityName: latest.assignedSecurityId?.name || null,
+              securityPhone: latest.assignedSecurityId?.phone || null,
+            });
+            setSosStatus("active");
+            
+            const start = new Date(latest.createdAt).getTime();
+            setElapsedTime(Math.floor((Date.now() - start) / 1000));
+            
+            if (!timerIntervalRef.current) {
+              timerIntervalRef.current = setInterval(() => {
+                setElapsedTime(prev => prev + 1);
+              }, 1000);
+            }
+            
+            startTracking();
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch existing SOS", err);
+      }
+    };
+    checkExisting();
   }, []);
 
   // Keep activeSOS ref in sync
@@ -246,8 +285,34 @@ export default function StudentSOSPage() {
         }
       }
     } catch (err) {
-      toast.error(err.response?.data?.error || "Failed to trigger SOS");
-      setSosStatus("inactive");
+      if (err.response?.status === 409 && err.response?.data?.data?.sosId) {
+        const existingData = err.response.data.data;
+        setActiveSOS({
+          _id: existingData.sosId,
+          status: existingData.status,
+          securityName: existingData.assignedGuard?.name || null,
+          securityPhone: existingData.assignedGuard?.phone || null,
+        });
+        setSosStatus("active");
+        
+        if (existingData.createdAt) {
+          const start = new Date(existingData.createdAt).getTime();
+          setElapsedTime(Math.floor((Date.now() - start) / 1000));
+        } else {
+          setElapsedTime(0);
+        }
+        
+        if (!timerIntervalRef.current) {
+          timerIntervalRef.current = setInterval(() => {
+            setElapsedTime(prev => prev + 1);
+          }, 1000);
+        }
+        startTracking();
+        toast.error("Restored your existing active SOS. You can cancel it below.", { duration: 5000 });
+      } else {
+        toast.error(err.response?.data?.error || "Failed to trigger SOS");
+        setSosStatus("inactive");
+      }
     }
   };
 
@@ -442,8 +507,8 @@ export default function StudentSOSPage() {
                     <p className="text-xs font-bold text-blue-600/60 uppercase tracking-widest">Responder</p>
                     <p className="font-bold text-blue-900 dark:text-blue-200">{activeSOS.securityName || "Security Officer"}</p>
                  </div>
-                 <a href={`tel:${activeSOS.securityPhone || "911"}`} className="ml-auto w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-lg">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 005.47 5.47l.772-1.547a1 1 0 011.06-.539l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+                 <a href={`tel:${activeSOS.securityPhone || "911"}`} className="ml-auto px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors flex items-center gap-2 text-white shadow-lg font-bold text-sm">
+                    <Phone className="w-4 h-4" /> {activeSOS.securityPhone || "Call Security"}
                  </a>
               </div>
            )}

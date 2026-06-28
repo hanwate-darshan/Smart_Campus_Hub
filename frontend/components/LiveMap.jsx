@@ -9,9 +9,31 @@ const MapContainer = dynamic(() => import("react-leaflet").then((mod) => mod.Map
 const TileLayer = dynamic(() => import("react-leaflet").then((mod) => mod.TileLayer), { ssr: false });
 const Marker = dynamic(() => import("react-leaflet").then((mod) => mod.Marker), { ssr: false });
 const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), { ssr: false });
+// MapController removed
 
 export default function LiveMap({ studentLocation, guardLocation }) {
   const [L, setL] = useState(null);
+  const [map, setMap] = useState(null);
+
+  useEffect(() => {
+    if (!map || !L || !studentLocation) return;
+    
+    const sLat = studentLocation[1];
+    const sLng = studentLocation[0];
+    const isStudentValid = sLat !== 0 && sLng !== 0;
+
+    if (guardLocation && isStudentValid) {
+      const bounds = L.latLngBounds(
+        [sLat, sLng],
+        [guardLocation[1], guardLocation[0]]
+      );
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 17 });
+    } else if (guardLocation && !isStudentValid) {
+      map.setView([guardLocation[1], guardLocation[0]], 17);
+    } else if (isStudentValid) {
+      map.setView([sLat, sLng], 17);
+    }
+  }, [map, studentLocation, guardLocation, L]);
 
   useEffect(() => {
     // Dynamically load Leaflet for icon configuration
@@ -35,8 +57,9 @@ export default function LiveMap({ studentLocation, guardLocation }) {
     );
   }
 
-  const studentLat = studentLocation[1];
-  const studentLng = studentLocation[0];
+  const studentLat = studentLocation ? studentLocation[1] : 0;
+  const studentLng = studentLocation ? studentLocation[0] : 0;
+  const isStudentValid = studentLat !== 0 && studentLng !== 0;
 
   const studentIcon = new L.Icon({
     iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
@@ -63,6 +86,7 @@ export default function LiveMap({ studentLocation, guardLocation }) {
   return (
     <div style={{ height: "100%", width: "100%", zIndex: 1 }}>
       <MapContainer
+        ref={setMap}
         center={[centerLat, centerLng]}
         zoom={guardLocation ? 16 : 17}
         style={{ height: "100%", width: "100%", zIndex: 1 }}
@@ -73,9 +97,11 @@ export default function LiveMap({ studentLocation, guardLocation }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
-        <Marker position={[studentLat, studentLng]} icon={studentIcon}>
-          <Popup>Student Location</Popup>
-        </Marker>
+        {isStudentValid && (
+          <Marker position={[studentLat, studentLng]} icon={studentIcon}>
+            <Popup>Student Location</Popup>
+          </Marker>
+        )}
 
         {guardLocation && (
           <Marker position={[guardLocation[1], guardLocation[0]]} icon={guardIcon}>

@@ -100,6 +100,7 @@ export default function SecurityDashboardPage() {
             icon: "/favicon.ico"
           });
         }
+        toast.error(`🚨 SOS EMERGENCY: ${payload.studentName} needs help!`, { duration: 10000 });
       }
     });
 
@@ -219,6 +220,14 @@ export default function SecurityDashboardPage() {
       
       // Join specific room
       socketRef.current.emit("join", `sos:${alertSOS.sosId}`);
+
+      // Immediately send our current location since watchPosition might not fire if stationary
+      if (guardLocation) {
+        socketRef.current.emit("security_location_update", {
+          coordinates: guardLocation,
+          sosId: alertSOS.sosId
+        });
+      }
     } catch (err) {
       toast.error("Failed to accept SOS. It might be already assigned.");
       setAlertSOS(null);

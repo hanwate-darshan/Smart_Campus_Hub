@@ -597,3 +597,22 @@
 2026-06-27 22:00:00:00 [31merror[39m: [31mError processing complaint escalation job sendEmail is not a function[39m
 2026-06-27 22:00:00:00 [31merror[39m: [31mError processing complaint escalation job sendEmail is not a function[39m
 2026-06-27 22:00:00:00 [31merror[39m: [31mError processing complaint escalation job sendEmail is not a function[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31mread ECONNRESET[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31m[31mread ECONNRESET[31m[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31m[31m[31mread ECONNRESET[31m[31m[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31m[31m[31m[31mread ECONNRESET[31m[31m[31m[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31m[31m[31m[31m[31mread ECONNRESET[31m[31m[31m[31m[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31m[31m[31m[31m[31m[31mread ECONNRESET[31m[31m[31m[31m[31m[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31m[31m[31m[31m[31m[31m[31mread ECONNRESET[31m[31m[31m[31m[31m[31m[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31m[31m[31m[31m[31m[31m[31m[31mread ECONNRESET[31m[31m[31m[31m[31m[31m[31m[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31mUNHANDLED REJECTION! 💥[39m
+2026-06-27 22:27:16:2716 [31merror[39m: [31m[31m[31m[31m[31m[31m[31m[31m[31mread ECONNRESET[31m[31m[31m[31m[31m[31m[31m[31m[39m
+2026-06-28 14:22:16:2216 [31merror[39m: [31mError processing complaint escalation job sendEmail is not a function[39m

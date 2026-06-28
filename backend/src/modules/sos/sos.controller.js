@@ -14,25 +14,42 @@ exports.triggerSOS = async (req, res, next) => {
     const { latitude, longitude } = req.body;
     const studentId = req.user._id;
 
-    // ── Check 1: Daily Limit ──
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const sosCount = await SOS.countDocuments({ studentId, createdAt: { $gte: startOfDay } });
-    if (sosCount >= 3) {
-      return res.status(429).json({ success: false, error: "SOS limit reached for today (Max 3/day)." });
-    }
+    // ── Check 1: Daily Limit (Temporarily disabled for testing) ──
+    // const startOfDay = new Date();
+    // startOfDay.setHours(0, 0, 0, 0);
+    // const sosCount = await SOS.countDocuments({ studentId, createdAt: { $gte: startOfDay } });
+    // if (sosCount >= 10) {
+    //   return res.status(429).json({ success: false, error: "SOS limit reached for today (Max 10/day)." });
+    // }
 
     // ── Check 2: Already Active SOS ──
     const existingActive = await SOS.findOne({
       studentId,
       status: { $in: ["active", "assigned", "reached"] }
-    });
+    }).populate("assignedSecurityId", "name phone");
+
     if (existingActive) {
-      return res.status(409).json({
-        success: false,
-        error: "You already have an active SOS. Please cancel it before triggering a new one.",
-        data: { sosId: existingActive._id, status: existingActive.status }
-      });
+      // Auto-cancel if it's older than 2 hours (Stale SOS bug fix)
+      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+      if (existingActive.createdAt < twoHoursAgo) {
+        existingActive.status = "cancelled";
+        existingActive.cancelledAt = new Date();
+        await existingActive.save();
+        console.log(`[SOS] Auto-cancelled stale SOS: ${existingActive._id}`);
+      } else {
+        return res.status(409).json({
+          success: false,
+          error: "You already have an active SOS. Please cancel it before triggering a new one.",
+          data: { 
+            sosId: existingActive._id, 
+            status: existingActive.status,
+            assignedGuard: existingActive.assignedSecurityId
+              ? { name: existingActive.assignedSecurityId.name, phone: existingActive.assignedSecurityId.phone }
+              : null,
+            createdAt: existingActive.createdAt
+          }
+        });
+      }
     }
 
     // ── Check 3: Campus Boundary (Geofence) ──
@@ -205,6 +222,7 @@ exports.acceptSOS = async (req, res, next) => {
       sosId: sos._id,
       status: "assigned",
       securityName: req.user.name,
+      securityPhone: req.user.phone,
       securityId: req.user._id
     });
 
@@ -315,6 +333,7 @@ exports.getActiveSOS = async (req, res, next) => {
 exports.getMySOSHistory = async (req, res, next) => {
   try {
     const history = await SOS.find({ studentId: req.user._id })
+      .populate("assignedSecurityId", "name phone")
       .sort({ createdAt: -1 })
       .limit(10);
 
