@@ -1,5 +1,7 @@
 const User = require('../../models/User.model');
 const ActivityLog = require('../../models/ActivityLog.model');
+const LostItem = require('../../models/LostItem.model');
+const Listing = require('../../models/Listing.model');
 const bcrypt = require('bcrypt');
 const { redisClient } = require('../../config/redis');
 const { getIO } = require('../../config/socket');
@@ -292,12 +294,16 @@ const getDashboardStats = async () => {
     totalTeachers,
     totalSecurity,
     recentActivity,
+    pendingLostFound,
+    pendingMarketplace,
   ] = await Promise.all([
     User.countDocuments({ role: 'student', status: 'approved' }),
     User.countDocuments({ role: 'student', status: 'pending' }),
     User.countDocuments({ role: 'teacher' }),
     User.countDocuments({ role: 'security' }),
     ActivityLog.find().sort({ createdAt: -1 }).limit(10),
+    LostItem.countDocuments({ status: 'pending_approval' }),
+    Listing.countDocuments({ status: 'pending' })
   ]);
 
   return {
@@ -305,6 +311,8 @@ const getDashboardStats = async () => {
     pendingApprovals,
     totalTeachers,
     totalSecurity,
+    pendingLostFound,
+    pendingMarketplace,
     activeComplaints: 0, // Mocked pending implementation
     activeSOS: 0, // Mocked pending implementation
     recentActivity,

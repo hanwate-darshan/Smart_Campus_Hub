@@ -35,4 +35,9 @@ router.get("/", getItems);
 router.patch("/:id/verify", requireRole("teacher"), verifyItem);
 router.patch("/:id/return", requireRole("teacher"), returnItem);
 
+// Admin routes
+const { approveItem, rejectItem } = require("./lostFound.controller");
+router.patch("/:id/approve", requireRole("admin"), approveItem);
+router.patch("/:id/reject", requireRole("admin"), rejectItem);
+
 module.exports = router;

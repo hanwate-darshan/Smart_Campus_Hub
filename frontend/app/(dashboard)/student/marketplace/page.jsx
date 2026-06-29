@@ -23,6 +23,7 @@ import toast from "react-hot-toast";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/auth.store";
+import { getNamespace } from "@/config/socket";
 
 const CATEGORIES = [
   { id: "", label: "All Items", icon: "💎" },
@@ -80,6 +81,24 @@ export default function MarketplacePage() {
     const timeout = setTimeout(fetchListings, 500); // Debounce search
     return () => clearTimeout(timeout);
   }, [activeCategory, search, minPrice, maxPrice, showMyListings]);
+
+  // Listen for new marketplace items
+  useEffect(() => {
+    if (!user) return;
+    const notificationsNs = getNamespace("/notifications");
+    
+    const handleNotification = (payload) => {
+      if (payload.type === "marketplace_update" || payload.type === "listing_approved") {
+        fetchListings();
+      }
+    };
+    
+    notificationsNs.on("notification_push", handleNotification);
+    
+    return () => {
+      notificationsNs.off("notification_push", handleNotification);
+    };
+  }, [user]);
 
   // 2. Chat Handler
   const startChat = async (listingId) => {

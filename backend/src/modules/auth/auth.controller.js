@@ -30,6 +30,14 @@ const register = async (req, res) => {
       data
     });
   } catch (err) {
+    require('../../config/logger').error("REGISTRATION ERROR: " + (err.stack || err.message));
+    if (err.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        error: `Duplicate Key Error: ${err.message}`,
+        message: 'Registration failed'
+      });
+    }
     res.status(err.statusCode || 500).json({
       success: false,
       error: err.message || 'Internal server error',

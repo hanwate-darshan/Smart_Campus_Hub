@@ -618,3 +618,11 @@
 2026-06-28 14:22:16:2216 [31merror[39m: [31mError processing complaint escalation job sendEmail is not a function[39m
 2026-06-28 16:03:10:310 [31merror[39m: [31mFailed to emit complaint socket notification getIo is not a function[39m
 2026-06-28 16:03:10:310 [31merror[39m: [31mFailed to send confirmation email to hanwatedarshan@gmail.com sendEmail is not a function[39m
+2026-06-29 20:51:19:5119 [31merror[39m: [31mREGISTRATION ERROR: Error: Email already registered[39m
+[31m    at Object.registerUser (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\auth\auth.service.js:36:19)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+[31m    at async register (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\auth\auth.controller.js:25:18)[39m
+2026-06-29 20:51:21:5121 [31merror[39m: [31mREGISTRATION ERROR: Error: Email already registered[39m
+[31m    at Object.registerUser (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\auth\auth.service.js:36:19)[39m
+[31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+[31m    at async register (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\auth\auth.controller.js:25:18)[39m

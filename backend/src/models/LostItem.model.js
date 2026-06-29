@@ -31,10 +31,10 @@ const lostItemSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: {
-        values: ["pending", "in_office", "returned", "archived"],
+        values: ["pending_approval", "pending", "in_office", "returned", "rejected", "archived"],
         message: "{VALUE} is not a valid status",
       },
-      default: "pending",
+      default: "pending_approval",
     },
     verifiedBy: {
       type: mongoose.Schema.Types.ObjectId,

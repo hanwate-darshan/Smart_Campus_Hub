@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import RoleGuard from "@/components/shared/RoleGuard";
 import useAuthStore from "@/store/auth.store";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import useNotificationStore from "@/store/notification.store";
 
 const navLinks = [
   { name: "Live Alerts", href: "/security/dashboard", icon: "🚨", dot: true },
@@ -21,6 +22,7 @@ export default function SecurityLayout({ children }) {
   const [isOnline, setIsOnline] = useState(true);
   const pathname = usePathname();
   const { user, clearAuth } = useAuthStore();
+  const unreadCount = useNotificationStore((state) => state.unreadCount);
 
   const handleLogout = () => {
     clearAuth();
@@ -67,7 +69,12 @@ export default function SecurityLayout({ children }) {
                 >
                   <span className="text-base w-5 text-center">{link.icon}</span>
                   <span className="flex-1">{link.name}</span>
-                  {link.dot && <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.5)]" />}
+                  {link.name === "Notifications" && unreadCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold" style={{ background: '#f28b82', color: '#131314' }}>
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                  {link.dot && link.name !== "Notifications" && <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.5)]" />}
                 </Link>
               );
             })}
@@ -91,9 +98,16 @@ export default function SecurityLayout({ children }) {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-1.5 rounded-lg text-[#9aa0a6] hover:bg-[#282a2c] transition-colors"
+                className="lg:hidden relative p-1.5 rounded-lg text-[#9aa0a6] hover:bg-[#282a2c] transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-[8px] font-bold"
+                    style={{ background: '#f28b82', color: '#131314' }}
+                  >
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
               </button>
               <span className="text-[13px] text-[#5f6368] hidden lg:block">Security Command</span>
             </div>

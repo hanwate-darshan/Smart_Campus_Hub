@@ -9,7 +9,8 @@ const {
   confirmPurchaseController,
   getMyListingsWithDealStatus,
   reportListing,
-  checkDuplicateListing
+  checkDuplicateListing,
+  deleteListing
 } = require("./listing.controller");
 const { validateCreateListing } = require("./listing.validator");
 const { authenticate } = require("../../middleware/auth.middleware");
@@ -49,5 +50,7 @@ router.patch("/:id/reject", requireRole("admin"), (req, res, next) => {
   req.body = { ...(req.body || {}), status: "rejected" };
   updateListingStatus(req, res, next);
 });
+
+router.delete("/:id", requireRole("admin", "student"), deleteListing);
 
 module.exports = router;

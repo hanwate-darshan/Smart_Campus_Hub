@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Bell, BellRing } from "lucide-react";
 import { getNamespace } from "../../config/socket";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 import useAuthStore from "@/store/auth.store";
+import useNotificationStore from "@/store/notification.store";
 import { useRouter } from "next/navigation";
 
 export default function NotificationBell() {
-  const [unreadCount, setUnreadCount] = useState(0);
+  const { unreadCount, setUnreadCount, incrementUnread } = useNotificationStore();
   const { user } = useAuthStore();
   const router = useRouter();
 
@@ -34,7 +35,7 @@ export default function NotificationBell() {
     if (user.role === 'teacher') notificationsNs.emit("join_teacher");
 
     const handleNewNotification = (payload) => {
-      setUnreadCount((prev) => prev + 1);
+      incrementUnread();
 
       toast.custom((t) => (
         <div

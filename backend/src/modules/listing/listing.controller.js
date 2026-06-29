@@ -35,13 +35,20 @@ exports.createListing = async (req, res, next) => {
     // Notify Admins
     const admins = await User.find({ role: "admin" }).select("_id");
     admins.forEach(admin => {
-      pushNotification(admin._id, {
+      pushNotification(admin._id.toString(), {
         type: "new_listing_pending",
         title: "New Marketplace Listing",
         message: `${req.user.name} posted: ${title}`,
         link: "/admin/marketplace"
       });
     });
+
+    try {
+      const { getIO } = require("../../config/socket");
+      getIO().of("/notifications").to("admin").emit("new_activity");
+    } catch (err) {
+      console.error("Socket emit failed in createListing:", err.message);
+    }
 
     res.status(201).json({ success: true, data: listing });
   } catch (err) {
@@ -441,6 +448,43 @@ exports.reportListing = async (req, res, next) => {
 
     // Step 6: Return success
     res.json({ success: true, message: "Listing reported. Thank you for keeping our marketplace safe." });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Route 8: Delete Listing
+exports.deleteListing = async (req, res, next) => {
+  try {
+    const listingId = req.params.id;
+    const listing = await Listing.findById(listingId);
+    
+    if (!listing) return res.status(404).json({ success: false, error: "Listing not found" });
+
+    // Allow deletion if admin OR if the student is the seller
+    if (req.user.role !== "admin" && listing.sellerId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, error: "Not authorized to delete this listing" });
+    }
+
+    await Listing.findByIdAndDelete(listingId);
+
+    // Also delete associated chat rooms
+    await ChatRoom.deleteMany({ listingId: listingId });
+
+    // Invalidate Cache
+    await invalidateMarketplaceCache();
+
+    // If admin deleted it, notify the seller
+    if (req.user.role === "admin") {
+      pushNotification(listing.sellerId, {
+        type: "listing_deleted",
+        title: "Listing Deleted by Admin",
+        message: `Your listing "${listing.title}" was permanently deleted by an administrator.`,
+        link: "/student/marketplace"
+      });
+    }
+
+    res.json({ success: true, message: "Listing deleted successfully" });
   } catch (err) {
     next(err);
   }

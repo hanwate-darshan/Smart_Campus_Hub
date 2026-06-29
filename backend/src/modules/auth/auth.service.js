@@ -29,7 +29,9 @@ const generateTokens = async (user) => {
 };
 
 const registerUser = async (userData, file) => {
-  const existingUser = await User.findOne({ email: userData.email });
+  const email = userData.email.trim().toLowerCase();
+  
+  const existingUser = await User.findOne({ email });
   if (existingUser) {
     const error = new Error('Email already registered');
     error.statusCode = 409;
@@ -46,7 +48,7 @@ const registerUser = async (userData, file) => {
 
   const user = new User({
     name: userData.name,
-    email: userData.email,
+    email: email,
     passwordHash,
     phone: userData.phone,
     role: 'student',

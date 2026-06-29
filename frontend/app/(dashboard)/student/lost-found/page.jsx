@@ -45,7 +45,7 @@ export default function StudentLostFoundPage() {
   // 1. Fetch Items
   const fetchItems = async () => {
     try {
-      const { data } = await api.get("/api/lost-found?status=in_office");
+      const { data } = await api.get("/api/lost-found?status=active");
       setItems(data.data);
     } catch (err) {
       toast.error("Failed to load lost items");
@@ -68,11 +68,10 @@ export default function StudentLostFoundPage() {
       fetchItems();
     });
 
-    socketRef.current.on("new_lost_found_item", (payload) => {
-      toast(`${payload.title} was found at ${payload.locationFound}`, {
-        icon: '🔍',
-        duration: 5000
-      });
+    socketRef.current.on("notification_push", (payload) => {
+      if (payload.type === "lost_found_update" || payload.type === "item_in_office") {
+        fetchItems();
+      }
     });
 
     return () => {
@@ -172,7 +171,11 @@ export default function StudentLostFoundPage() {
                   <div className="aspect-square relative overflow-hidden">
                     <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute top-4 left-4">
-                       <span className="bg-emerald-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg">IN OFFICE</span>
+                       {item.status === 'in_office' ? (
+                         <span className="bg-emerald-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg">IN OFFICE</span>
+                       ) : (
+                         <span className="bg-amber-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg">PENDING</span>
+                       )}
                     </div>
                   </div>
                   <div className="p-5">
@@ -305,7 +308,11 @@ export default function StudentLostFoundPage() {
               </div>
               <div className="md:w-1/2 p-10 flex flex-col">
                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-black text-emerald-500 border border-emerald-500 px-3 py-1 rounded-full uppercase tracking-widest">In Office Verification</span>
+                    {selectedItem.status === 'in_office' ? (
+                      <span className="text-[10px] font-black text-emerald-500 border border-emerald-500 px-3 py-1 rounded-full uppercase tracking-widest">In Office Verification</span>
+                    ) : (
+                      <span className="text-[10px] font-black text-amber-500 border border-amber-500 px-3 py-1 rounded-full uppercase tracking-widest">Pending Verification</span>
+                    )}
                     <button onClick={() => setSelectedItem(null)} className="hidden md:block text-slate-300 hover:text-slate-500 transition-colors"><X className="w-6 h-6" /></button>
                  </div>
                  <h2 className="text-3xl font-black text-slate-800 dark:text-white mt-4">{selectedItem.title}</h2>
@@ -323,12 +330,16 @@ export default function StudentLostFoundPage() {
 
                  <div className="mt-10 p-6 bg-blue-50 dark:bg-blue-900/10 rounded-[2rem] border border-blue-100 dark:border-blue-900/30">
                     <div className="flex gap-4 items-center">
-                       <div className="w-12 h-12 rounded-2xl bg-blue-500 flex items-center justify-center text-white">
+                       <div className="w-12 h-12 rounded-2xl bg-blue-500 flex items-center justify-center text-white shrink-0">
                           <Maximize2 className="w-6 h-6" />
                        </div>
                        <div className="flex-1">
                           <h4 className="font-black text-blue-700 dark:text-blue-300 text-sm">This is mine!</h4>
-                          <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1 uppercase tracking-tighter">Visit the college office with your ID card to claim this item.</p>
+                          {selectedItem.status === 'in_office' ? (
+                            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1 uppercase tracking-tighter">Visit the college office with your ID card to claim this item.</p>
+                          ) : (
+                            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1 uppercase tracking-tighter">Item is not yet at the office. Please check back later when its status is 'IN OFFICE'.</p>
+                          )}
                        </div>
                     </div>
                  </div>

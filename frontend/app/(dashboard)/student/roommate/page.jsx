@@ -9,9 +9,12 @@ import {
 import toast from "react-hot-toast";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
+import useAuthStore from "@/store/auth.store";
+import { getNamespace } from "@/config/socket";
 
 export default function RoommatePage() {
   const router = useRouter();
+  const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState("students"); // students, requests, profile
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -38,6 +41,24 @@ export default function RoommatePage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Listen for roommate requests
+  useEffect(() => {
+    if (!user) return;
+    const notificationsNs = getNamespace("/notifications");
+    
+    const handleNotification = (payload) => {
+      if (payload.type === "roommate_request") {
+        fetchData();
+      }
+    };
+    
+    notificationsNs.on("notification_push", handleNotification);
+    
+    return () => {
+      notificationsNs.off("notification_push", handleNotification);
+    };
+  }, [user]);
 
   const fetchData = async () => {
     setLoading(true);

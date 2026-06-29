@@ -123,19 +123,24 @@ export default function AdminMarketplacePage() {
 
   const handleReject = async (e) => {
     e.preventDefault();
-    if (!rejectionReason.trim()) return toast.error("Please provide a reason");
+    if (rejectionMode !== "delete" && !rejectionReason.trim()) return toast.error("Please provide a reason");
 
     setProcessing(true);
     try {
-      await api.patch(`/api/listings/${rejectionListing._id}/reject`, {
-        reason: rejectionReason,
-        flagSeller: rejectionMode === "remove_flag"
-      });
-
-      if (rejectionMode === "remove_flag") {
-        toast.success("Listing removed and seller flagged for review.");
+      if (rejectionMode === "delete") {
+        await api.delete(`/api/listings/${rejectionListing._id}`);
+        toast.success("Listing permanently deleted.");
       } else {
-        toast.success("Listing removed and seller notified.");
+        await api.patch(`/api/listings/${rejectionListing._id}/reject`, {
+          reason: rejectionReason,
+          flagSeller: rejectionMode === "remove_flag"
+        });
+
+        if (rejectionMode === "remove_flag") {
+          toast.success("Listing removed and seller flagged for review.");
+        } else {
+          toast.success("Listing removed and seller notified.");
+        }
       }
 
       setRejectionListing(null);
@@ -143,7 +148,7 @@ export default function AdminMarketplacePage() {
       setRejectionMode("remove");
       fetchListings();
     } catch (err) {
-      toast.error("Failed to remove listing");
+      toast.error("Failed to process listing action");
     } finally {
       setProcessing(false);
     }
@@ -390,18 +395,26 @@ export default function AdminMarketplacePage() {
 
                       {/* Action Buttons */}
                       {activeTab === "pending" ? (
-                        <div className="flex gap-4">
+                        <div className="flex flex-col gap-3">
+                          <div className="flex gap-4">
+                            <button
+                              onClick={() => handleApprove(item._id)}
+                              className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+                            >
+                              <CheckCircle className="w-4 h-4" /> APPROVE
+                            </button>
+                            <button
+                              onClick={() => { setRejectionListing(item); setRejectionMode("remove"); }}
+                              className="flex-1 py-4 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-2xl font-black text-sm hover:bg-red-100 transition-all flex items-center justify-center gap-2 border border-red-100 dark:border-red-900/40"
+                            >
+                              <XCircle className="w-4 h-4" /> REJECT
+                            </button>
+                          </div>
                           <button
-                            onClick={() => handleApprove(item._id)}
-                            className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+                            onClick={() => { setRejectionListing(item); setRejectionMode("delete"); }}
+                            className="w-full py-3.5 bg-red-900 hover:bg-red-950 text-white rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-2"
                           >
-                            <CheckCircle className="w-4 h-4" /> APPROVE
-                          </button>
-                          <button
-                            onClick={() => { setRejectionListing(item); setRejectionMode("remove"); }}
-                            className="flex-1 py-4 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-2xl font-black text-sm hover:bg-red-100 transition-all flex items-center justify-center gap-2 border border-red-100 dark:border-red-900/40"
-                          >
-                            <XCircle className="w-4 h-4" /> REJECT
+                            <Trash2 className="w-4 h-4" /> Permanently Delete
                           </button>
                         </div>
                       ) : (
@@ -416,13 +429,19 @@ export default function AdminMarketplacePage() {
                             onClick={() => { setRejectionListing(item); setRejectionMode("remove"); }}
                             className="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black text-xs transition-all shadow-lg shadow-red-500/20 flex items-center justify-center gap-2"
                           >
-                            <Trash2 className="w-4 h-4" /> Remove Listing
+                            <Trash2 className="w-4 h-4" /> Reject (Hide from Store)
                           </button>
                           <button
                             onClick={() => { setRejectionListing(item); setRejectionMode("remove_flag"); }}
                             className="w-full py-3.5 bg-slate-900 dark:bg-red-950 hover:bg-red-950 dark:hover:bg-red-900 text-white rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-2"
                           >
-                            <ShieldOff className="w-4 h-4" /> Remove + Flag Seller for Review
+                            <ShieldOff className="w-4 h-4" /> Reject + Flag Seller
+                          </button>
+                          <button
+                            onClick={() => { setRejectionListing(item); setRejectionMode("delete"); }}
+                            className="w-full py-3.5 bg-red-900 hover:bg-red-950 text-white rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-2"
+                          >
+                            <Trash2 className="w-4 h-4" /> Permanently Delete
                           </button>
                         </div>
                       )}
@@ -450,9 +469,14 @@ export default function AdminMarketplacePage() {
                 }
               </div>
               <h2 className="text-3xl font-black text-slate-800 dark:text-white">
-                {rejectionMode === "remove_flag" ? "Remove & Flag Seller" : activeTab === "pending" ? "Reject Listing" : "Remove Listing"}
+                {rejectionMode === "delete" ? "Permanently Delete" : rejectionMode === "remove_flag" ? "Remove & Flag Seller" : activeTab === "pending" ? "Reject Listing" : "Remove Listing"}
               </h2>
               <p className="text-slate-500 font-medium mt-2">Item: <span className="font-black text-slate-700 dark:text-slate-300">{rejectionListing.title}</span></p>
+              {rejectionMode === "delete" && (
+                <p className="text-xs text-red-600 font-bold mt-3 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-xl">
+                  ⚠️ This action cannot be undone. The listing will be completely deleted from the database.
+                </p>
+              )}
               {rejectionMode === "remove_flag" && (
                 <p className="text-xs text-amber-600 font-bold mt-3 bg-amber-50 dark:bg-amber-900/20 px-4 py-2 rounded-xl">
                   ⚠️ This will flag the seller for admin review and remove their listing.
@@ -460,17 +484,19 @@ export default function AdminMarketplacePage() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reason</label>
-              <textarea
-                required
-                rows="4"
-                placeholder="e.g. Inappropriate content, fake listing, prohibited item..."
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-red-500 font-bold text-slate-800 dark:text-white transition-all resize-none"
-              />
-            </div>
+            {rejectionMode !== "delete" && (
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reason</label>
+                <textarea
+                  required
+                  rows="4"
+                  placeholder="e.g. Inappropriate content, fake listing, prohibited item..."
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-red-500 font-bold text-slate-800 dark:text-white transition-all resize-none"
+                />
+              </div>
+            )}
 
             <div className="flex gap-4 pt-4">
               <button
@@ -486,7 +512,7 @@ export default function AdminMarketplacePage() {
                 className={`flex-[2] py-4 px-6 rounded-2xl text-white font-black text-sm transition-all flex items-center justify-center gap-2 shadow-xl ${rejectionMode === "remove_flag" ? "bg-slate-900 hover:bg-red-700 shadow-slate-900/30" : "bg-red-600 hover:bg-red-700 shadow-red-500/20"}`}
               >
                 {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
-                {rejectionMode === "remove_flag" ? "REMOVE & FLAG SELLER" : "CONFIRM REMOVAL"}
+                {rejectionMode === "delete" ? "PERMANENTLY DELETE" : rejectionMode === "remove_flag" ? "REMOVE & FLAG SELLER" : "CONFIRM REMOVAL"}
               </button>
             </div>
           </form>
