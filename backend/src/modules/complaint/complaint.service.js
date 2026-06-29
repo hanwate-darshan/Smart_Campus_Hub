@@ -343,9 +343,8 @@ const getComplaintById = async ({ complaintId, requestingUserId, requestingUserR
 
   if (requestingUserRole === "student") {
     if (complaint.studentId._id.toString() !== requestingUserId.toString()) {
-      const err = new Error("Forbidden access");
-      err.status = 403;
-      throw err;
+      // It's a public view by another student. Hide email for privacy.
+      complaint.studentId.email = null;
     }
   }
 

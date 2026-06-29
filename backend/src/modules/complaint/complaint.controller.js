@@ -107,7 +107,7 @@ exports.updateStatus = async (req, res) => {
       comment: value.comment,
       updatedBy: req.user._id,
       updatedByRole: req.user.role,
-      updatedByName: req.user.name
+      updatedByName: req.user.name || "Admin/Teacher"
     });
 
     return res.status(200).json({ success: true, data: complaint, message: "Status updated." });
@@ -127,11 +127,12 @@ exports.addComment = async (req, res) => {
       return res.status(400).json({ success: false, error: error.details[0].message });
     }
 
+    console.log("Adding comment by user:", req.user._id, "Role:", req.user.role, "Name:", req.user.name);
     const complaint = await complaintService.addComment({
       complaintId: req.params.id,
       authorId: req.user._id,
       authorRole: req.user.role,
-      authorName: req.user.name,
+      authorName: req.user.name || "Admin/Teacher",
       text: value.text
     });
 

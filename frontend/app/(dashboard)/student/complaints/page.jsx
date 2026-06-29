@@ -58,7 +58,7 @@ export default function StudentComplaintsPage() {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    if (activeTab === "my_complaints") {
+    if (activeTab === "my_complaints" || activeTab === "public_complaints") {
       fetchComplaints(1, true);
     }
   }, [activeTab]);
@@ -70,7 +70,7 @@ export default function StudentComplaintsPage() {
       socketRef.current.on("notification_push", (data) => {
         if (data.type === "complaint_update" || data.type === "complaint_comment") {
           toast.success(data.title + ": " + data.message);
-          if (activeTab === "my_complaints") fetchComplaints(1, true);
+          if (activeTab === "my_complaints" || activeTab === "public_complaints") fetchComplaints(1, true);
         }
       });
     }
@@ -83,7 +83,8 @@ export default function StudentComplaintsPage() {
   const fetchComplaints = async (pageNum = 1, reset = false) => {
     try {
       if (reset) setLoading(true);
-      const { data } = await api.get(`/api/complaints/mine?page=${pageNum}&limit=10`);
+      const endpoint = activeTab === "public_complaints" ? "/api/complaints" : "/api/complaints/mine";
+      const { data } = await api.get(`${endpoint}?page=${pageNum}&limit=10`);
       if (reset) {
         setComplaints(data.data.complaints);
       } else {
@@ -179,7 +180,7 @@ export default function StudentComplaintsPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl w-full max-w-sm">
+      <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl w-full max-w-lg">
         <button
           onClick={() => { setActiveTab("my_complaints"); setSuccessScreen(false); }}
           className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${
@@ -187,6 +188,14 @@ export default function StudentComplaintsPage() {
           }`}
         >
           My Complaints
+        </button>
+        <button
+          onClick={() => { setActiveTab("public_complaints"); setSuccessScreen(false); }}
+          className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${
+            activeTab === "public_complaints" ? "bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-white" : "text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          Public Board
         </button>
         <button
           onClick={() => setActiveTab("submit")}
@@ -198,7 +207,7 @@ export default function StudentComplaintsPage() {
         </button>
       </div>
 
-      {activeTab === "my_complaints" && (
+      {(activeTab === "my_complaints" || activeTab === "public_complaints") && (
         <div className="space-y-4">
           {loading && page === 1 ? (
             <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>
@@ -206,7 +215,9 @@ export default function StudentComplaintsPage() {
             <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700">
               <ClipboardList className="w-16 h-16 text-slate-300 mx-auto mb-4" />
               <h3 className="text-xl font-black text-slate-800 dark:text-white">No complaints yet</h3>
-              <p className="text-slate-500 mt-2 mb-6">You haven't submitted any complaints.</p>
+              <p className="text-slate-500 mt-2 mb-6">
+                {activeTab === "my_complaints" ? "You haven't submitted any complaints." : "No public complaints found."}
+              </p>
               <button 
                 onClick={() => setActiveTab("submit")}
                 className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl"
@@ -228,8 +239,15 @@ export default function StudentComplaintsPage() {
                   </div>
                   
                   <h3 className="text-lg font-black text-slate-800 dark:text-white mb-1">
-                    {comp.title} {comp.isAnonymous && <span className="text-xs text-slate-400 font-medium ml-2">(Anonymous)</span>}
+                    {comp.title} 
+                    {comp.studentId?._id === user?._id && <span className="text-[10px] font-bold text-white bg-blue-600 px-2 py-0.5 rounded-full ml-2">Yours</span>}
+                    {comp.isAnonymous && <span className="text-xs text-slate-400 font-medium ml-2">(Anonymous)</span>}
                   </h3>
+                  {activeTab === "public_complaints" && (
+                    <p className="text-xs text-slate-500 font-medium mb-3">
+                      By {comp.studentId?.name || "Unknown"}
+                    </p>
+                  )}
                   
                   {!expandedId || expandedId !== comp._id ? (
                     <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{comp.description}</p>

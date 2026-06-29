@@ -5,6 +5,7 @@ const User = require("../../models/User.model");
 const pushNotification = require("../../utils/pushNotification");
 const { getIo } = require("../../config/socket");
 const { roommateFollowupQueue } = require("../../jobs/roommate.followup");
+const { uploadToCloudinary } = require("../../utils/cloudinary");
 
 // Helper: Calculate Match Score and Generate Generic Reasons
 const calculateScoreAndReasons = (my, their) => {
@@ -49,9 +50,28 @@ const calculateScoreAndReasons = (my, their) => {
 // Route 1: Create/Update Profile
 exports.upsertProfile = async (req, res, next) => {
   try {
+    const updateData = { ...req.body, userId: req.user._id, isActive: true };
+    
+    if (typeof updateData.budgetRange === 'string') {
+      try { updateData.budgetRange = JSON.parse(updateData.budgetRange); } catch(e) {}
+    }
+    if (typeof updateData.location === 'string') {
+      try { updateData.location = JSON.parse(updateData.location); } catch(e) {}
+    }
+    if (typeof updateData.existingImages === 'string') {
+      try { updateData.images = JSON.parse(updateData.existingImages); } catch(e) {}
+      delete updateData.existingImages;
+    }
+
+    if (req.files && req.files.length > 0) {
+      const uploadPromises = req.files.map(file => uploadToCloudinary(file.buffer, "smart-campus/roommate"));
+      const newImages = await Promise.all(uploadPromises);
+      updateData.images = [...(updateData.images || []), ...newImages];
+    }
+
     const profile = await RoommateProfile.findOneAndUpdate(
       { userId: req.user._id },
-      { ...req.body, userId: req.user._id, isActive: true },
+      updateData,
       { new: true, upsert: true, runValidators: true }
     );
     res.json({ success: true, data: profile });
@@ -64,9 +84,6 @@ exports.upsertProfile = async (req, res, next) => {
 exports.getMatches = async (req, res, next) => {
   try {
     const myProfile = await RoommateProfile.findOne({ userId: req.user._id });
-    if (!myProfile) {
-      return res.status(400).json({ success: false, error: "Create your profile first" });
-    }
 
     // Exclusion list
     const existingRequests = await RoommateRequest.find({
@@ -96,6 +113,7 @@ exports.getMatches = async (req, res, next) => {
         location: profile.location,
         bio: profile.bio,
         hobbies: profile.hobbies,
+        images: profile.images,
         score: matchResult.score,
         matchReasons: matchResult.reasons
         // Notice we DO NOT send smokingPreference, cleanliness, sleepSchedule, budgetRange, dealBreakers
@@ -259,7 +277,8 @@ exports.getRequests = async (req, res, next) => {
               sleepSchedule: otherProfile.sleepSchedule,
               cleanliness: otherProfile.cleanliness,
               dealBreakers: otherProfile.dealBreakers,
-              duration: otherProfile.duration
+              duration: otherProfile.duration,
+              images: otherProfile.images
             };
           } else {
             // Only safe fields revealed
@@ -267,7 +286,8 @@ exports.getRequests = async (req, res, next) => {
               department: otherProfile.department,
               year: otherProfile.year,
               bio: otherProfile.bio,
-              hobbies: otherProfile.hobbies
+              hobbies: otherProfile.hobbies,
+              images: otherProfile.images
             };
           }
         }

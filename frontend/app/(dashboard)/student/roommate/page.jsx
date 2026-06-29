@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { 
   Users, UserCircle, MessageSquare, Heart, X, Plus, Check, Loader2, ChevronRight, 
   ShieldCheck, DollarSign, Moon, Sun, Sparkles, ArrowRight, Handshake, Clock, Send, 
-  AlertTriangle, Filter, MapPin
+  AlertTriangle, Filter, MapPin, Camera
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/lib/api";
@@ -37,6 +37,44 @@ export default function RoommatePage() {
   const [hobbyInput, setHobbyInput] = useState("");
   const [dealBreakerInput, setDealBreakerInput] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Images
+  const [images, setImages] = useState([]);
+  const [previews, setPreviews] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    
+    const validFiles = files.filter(file => {
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not a valid image`);
+        return false;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} exceeds the 5MB size limit`);
+        return false;
+      }
+      return true;
+    });
+
+    if (existingImages.length + images.length + validFiles.length > 3) {
+      return toast.error("Maximum 3 images allowed total");
+    }
+
+    setImages(prev => [...prev, ...validFiles]);
+    const newPreviews = validFiles.map(file => URL.createObjectURL(file));
+    setPreviews(prev => [...prev, ...newPreviews]);
+  };
+
+  const removeImage = (index) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+    setPreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (index) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
+  };
 
   useEffect(() => {
     fetchData();
@@ -73,10 +111,11 @@ export default function RoommatePage() {
             budgetRange: profData.data.budgetRange || { min: "", max: "" },
             location: profData.data.location || { state: "", city: "", area: "" }
           });
+          setExistingImages(profData.data.images || []);
         }
       } catch (err) {
         if (err.response?.status === 404) {
-          setActiveTab("profile");
+          // Do nothing, let them stay on the students tab to browse
         }
       }
 
@@ -106,8 +145,26 @@ export default function RoommatePage() {
     }
     setSaving(true);
     try {
-      const { data } = await api.post("/api/roommate/profile", formData);
+      const dataToSend = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (key === 'budgetRange' || key === 'location') {
+          dataToSend.append(key, JSON.stringify(formData[key]));
+        } else {
+          dataToSend.append(key, formData[key]);
+        }
+      });
+      dataToSend.append('existingImages', JSON.stringify(existingImages));
+      images.forEach(img => dataToSend.append("images", img));
+
+      const { data } = await api.post("/api/roommate/profile", dataToSend, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      
       setProfile(data.data);
+      setImages([]);
+      setPreviews([]);
+      setExistingImages(data.data.images || []);
+      
       toast.success("Profile saved! You can now browse students.");
       fetchData();
       setActiveTab("students");
@@ -120,6 +177,11 @@ export default function RoommatePage() {
 
 
   const sendRequest = async (userId) => {
+    if (!profile) {
+      toast.error("Please create your profile first to send requests");
+      setActiveTab("profile");
+      return;
+    }
     try {
       await api.post(`/api/roommate/request/${userId}`);
       toast.success("Roommate request sent!");
@@ -197,21 +259,23 @@ export default function RoommatePage() {
       {/* TAB: STUDENTS */}
       {activeTab === "students" && (
         <div className="space-y-6">
-          {!profile ? (
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-8 rounded-3xl text-center">
-               <ShieldCheck className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-               <h3 className="text-xl font-black text-blue-900 dark:text-blue-400 mb-2">Create Your Profile</h3>
-               <p className="text-blue-700 dark:text-blue-300 max-w-md mx-auto mb-6">
-                 To view other students, you first need to create your own roommate profile.
-               </p>
+          {!profile && matches.length > 0 && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4">
+               <div>
+                 <h3 className="text-lg font-black text-blue-900 dark:text-blue-400">Want to find your perfect match?</h3>
+                 <p className="text-blue-700 dark:text-blue-300 text-sm mt-1">
+                   Create your roommate profile to see match scores and send requests!
+                 </p>
+               </div>
                <button 
                  onClick={() => setActiveTab("profile")}
-                 className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl"
+                 className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl whitespace-nowrap"
                >
-                 Create Profile to View Students
+                 Create Profile
                </button>
             </div>
-          ) : matches.length === 0 ? (
+          )}
+          {matches.length === 0 ? (
             <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700">
                <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" />
                <h3 className="text-xl font-black text-slate-800 dark:text-white">No students found right now</h3>
@@ -239,26 +303,51 @@ export default function RoommatePage() {
                             )}
                           </div>
                         </div>
-                        <div className={`flex flex-col items-center justify-center w-12 h-12 rounded-full ${badge.color} text-white shadow-lg`}>
-                          <span className="text-lg font-black leading-none">{match.score}</span>
-                          <span className="text-[8px] font-bold uppercase">Match</span>
-                        </div>
+                        {profile ? (
+                          <div className={`flex flex-col items-center justify-center w-12 h-12 rounded-full ${badge.color} text-white shadow-lg`}>
+                            <span className="text-lg font-black leading-none">{match.score}</span>
+                            <span className="text-[8px] font-bold uppercase">Match</span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 shadow-sm">
+                            <span className="text-lg font-black leading-none">?</span>
+                          </div>
+                        )}
                       </div>
 
-                      <div className="mb-4 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl">
-                         <h4 className="text-[10px] font-black uppercase text-slate-400 mb-2">Why this match?</h4>
-                         <ul className="space-y-1">
-                           {match.matchReasons?.length > 0 ? match.matchReasons.map((reason, i) => (
-                             <li key={i} className="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2">
-                               <Check className="w-3 h-3 text-blue-500" /> {reason}
-                             </li>
-                           )) : (
-                             <li className="text-xs text-slate-500">Basic profile match</li>
-                           )}
-                         </ul>
-                      </div>
+                      {profile ? (
+                        <div className="mb-4 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl">
+                           <h4 className="text-[10px] font-black uppercase text-slate-400 mb-2">Why this match?</h4>
+                           <ul className="space-y-1">
+                             {match.matchReasons?.length > 0 ? match.matchReasons.map((reason, i) => (
+                               <li key={i} className="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                                 <Check className="w-3 h-3 text-blue-500" /> {reason}
+                               </li>
+                             )) : (
+                               <li className="text-xs text-slate-500">Basic profile match</li>
+                             )}
+                           </ul>
+                        </div>
+                      ) : (
+                        <div className="mb-4 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl text-center">
+                           <p className="text-xs font-bold text-slate-500">Create profile to see match reasons</p>
+                        </div>
+                      )}
 
                       {match.bio && <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-4">"{match.bio}"</p>}
+
+                      {match.images && match.images.length > 0 && (
+                        <div className="mb-4">
+                          <h4 className="text-[10px] font-black uppercase text-slate-400 mb-2">PG/Hostel Photos</h4>
+                          <div className="flex gap-2 overflow-x-auto pb-2 snap-x">
+                            {match.images.map((img, idx) => (
+                              <a href={img} target="_blank" rel="noreferrer" key={idx}>
+                                <img src={img} className="h-20 w-20 object-cover rounded-xl shrink-0 snap-start border border-slate-200 dark:border-slate-700 hover:opacity-80 transition-opacity" />
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       <button 
                         onClick={() => sendRequest(match.userId)}
@@ -328,6 +417,19 @@ export default function RoommatePage() {
                              <div className="text-slate-500">Duration</div>
                              <div className="font-bold capitalize">{req.otherProfile.duration?.replace("_", " ")}</div>
                            </div>
+
+                           {req.otherProfile.images && req.otherProfile.images.length > 0 && (
+                             <div className="mt-3">
+                               <h5 className="font-black text-[10px] text-slate-400 uppercase tracking-widest mb-2">Photos</h5>
+                               <div className="flex gap-2 overflow-x-auto snap-x">
+                                 {req.otherProfile.images.map((img, idx) => (
+                                   <a href={img} target="_blank" rel="noreferrer" key={idx}>
+                                     <img src={img} className="h-16 w-16 object-cover rounded-lg shrink-0 snap-start border border-slate-200 dark:border-slate-700 hover:opacity-80 transition-opacity" />
+                                   </a>
+                                 ))}
+                               </div>
+                             </div>
+                           )}
                          </div>
                        )}
 
@@ -375,6 +477,18 @@ export default function RoommatePage() {
                          <div className="text-slate-500">Duration</div>
                          <div className="font-bold capitalize">{req.otherProfile.duration?.replace("_", " ")}</div>
                        </div>
+                       {req.otherProfile.images && req.otherProfile.images.length > 0 && (
+                         <div className="mt-3">
+                           <h5 className="font-black text-[10px] text-slate-400 uppercase tracking-widest mb-2">Photos</h5>
+                           <div className="flex gap-2 overflow-x-auto snap-x">
+                             {req.otherProfile.images.map((img, idx) => (
+                               <a href={img} target="_blank" rel="noreferrer" key={idx}>
+                                 <img src={img} className="h-16 w-16 object-cover rounded-lg shrink-0 snap-start border border-slate-200 dark:border-slate-700 hover:opacity-80 transition-opacity" />
+                               </a>
+                             ))}
+                           </div>
+                         </div>
+                       )}
                        <button 
                          onClick={() => router.push(`/student/marketplace/chat/${req.chatRoomId}`)}
                          className="mt-3 w-full py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold rounded-xl text-sm transition-colors"
@@ -502,6 +616,47 @@ export default function RoommatePage() {
           </div>
 
           <div className="border-t border-slate-100 dark:border-slate-700 pt-8 space-y-6">
+
+            {/* --- IMAGES --- */}
+            <div className="space-y-4">
+               <label className="text-sm font-black text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                 <Camera className="w-4 h-4 text-blue-500" /> PG / Hostel Photos (Optional, Max 3)
+               </label>
+               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {existingImages.map((src, i) => (
+                    <div key={`existing-${i}`} className="aspect-square relative rounded-3xl overflow-hidden group border border-slate-200 dark:border-slate-700">
+                      <img src={src} className="w-full h-full object-cover" />
+                      <button 
+                        type="button"
+                        onClick={() => removeExistingImage(i)}
+                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  {previews.map((src, i) => (
+                    <div key={`new-${i}`} className="aspect-square relative rounded-3xl overflow-hidden group border border-blue-200">
+                      <img src={src} className="w-full h-full object-cover" />
+                      <button 
+                        type="button"
+                        onClick={() => removeImage(i)}
+                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  {(existingImages.length + previews.length) < 3 && (
+                    <label className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group">
+                      <Plus className="w-10 h-10 text-slate-300 group-hover:text-blue-500" />
+                      <span className="text-[10px] font-black text-slate-400 mt-2 uppercase tracking-tighter">Add Photo</span>
+                      <input type="file" multiple accept="image/*" onChange={handleImageChange} className="hidden" />
+                    </label>
+                  )}
+               </div>
+               <p className="text-xs text-slate-500 font-bold">Showcase your room, PG, or flat so potential roommates can see where they'll stay.</p>
+            </div>
 
             <div>
               <label className="block text-sm font-black text-slate-700 dark:text-slate-300 mb-2">Bio</label>

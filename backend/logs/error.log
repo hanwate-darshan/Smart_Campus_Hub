@@ -626,3 +626,4 @@
 [31m    at Object.registerUser (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\auth\auth.service.js:36:19)[39m
 [31m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
 [31m    at async register (C:\Users\darsh\OneDrive\Desktop\Campus Hub\backend\src\modules\auth\auth.controller.js:25:18)[39m
+2026-06-29 22:51:23:5123 [31merror[39m: [31mError in addComment controller Complaint validation failed: comments.0.authorName: Path `authorName` is required.[39m

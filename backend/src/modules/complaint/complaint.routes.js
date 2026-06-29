@@ -39,7 +39,7 @@ router.get(
 router.get(
   "/",
   authenticate,
-  requireRole("teacher", "admin"),
+  requireRole("teacher", "admin", "student"),
   complaintController.getAllComplaints
 );
 
