@@ -4627,3 +4627,8 @@
 2026-06-29 23:36:58:3658 [32minfo[39m: [32m::1 - - [29/Jun/2026:18:06:58 +0000] "GET /api/roommate/profile HTTP/1.1" 404 159 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0"[39m
 2026-06-29 23:36:58:3658 [32minfo[39m: [32m::1 - - [29/Jun/2026:18:06:58 +0000] "GET /api/roommate/matches HTTP/1.1" 200 533 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0"[39m
 2026-06-29 23:36:58:3658 [32minfo[39m: [32m::1 - - [29/Jun/2026:18:06:58 +0000] "GET /api/roommate/requests HTTP/1.1" 200 462 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0"[39m
+2026-06-30 00:00:04:04 [32minfo[39m: [32m[JOB] Starting chat no-response check: repeat:4ae1152a5551f6f5ab5acd56dc6466d4:1782757800000[39m
+2026-06-30 00:00:05:05 [32minfo[39m: [32m[JOB] Starting deal completion reminder check: repeat:052642c1bf9ff2ef36aab24b9c31b6d5:1782757800000[39m
+2026-06-30 00:00:07:07 [32minfo[39m: [32m[JOB] Deal reminder check completed. Sent 0 notifications.[39m
+2026-06-30 00:00:07:07 [32minfo[39m: [32mNo complaints to escalate[39m
+2026-06-30 00:00:08:08 [32minfo[39m: [32m[JOB] Chat no-response check completed. Sent 0 notifications.[39m
