@@ -70,7 +70,6 @@ export default function MarketplacePage() {
       const { data } = await api.get(endpoint, { params });
       setListings(data.data);
     } catch (err) {
-      console.error("Marketplace load error:", err);
       toast.error(err.response?.data?.error || err.message || "Failed to load marketplace");
     } finally {
       setLoading(false);

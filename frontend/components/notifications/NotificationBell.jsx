@@ -20,7 +20,7 @@ export default function NotificationBell() {
       const { data } = await api.get("/api/notifications/unread-count");
       setUnreadCount(data.count);
     } catch (err) {
-      console.error("Failed to fetch unread count", err);
+      // Avoid passing raw Axios err object to prevent header/token leakage in console
     }
   };
 

@@ -12,7 +12,7 @@ const generateTokens = async (user) => {
   const accessToken = jwt.sign(
     { id: user._id, role: user.role, status: user.status },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '15m' }
+    { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
   );
 
   const refreshToken = jwt.sign(
@@ -43,7 +43,12 @@ const registerUser = async (userData, file) => {
 
   let idProofUrl = '';
   if (file) {
-    idProofUrl = await uploadToCloudinary(file.buffer, 'smart-campus/id-proofs');
+    try {
+      idProofUrl = await uploadToCloudinary(file.buffer, 'smart-campus/id-proofs');
+    } catch (err) {
+      console.error('Cloudinary upload failed for idProof, saving base64 fallback:', err.message);
+      idProofUrl = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+    }
   }
 
   const user = new User({
@@ -217,16 +222,22 @@ const refreshTokenService = async (refreshToken) => {
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
     const userId = decoded.id;
 
-    const storedToken = await redisClient.get(`refresh:${userId}`);
-    if (!storedToken || storedToken !== refreshToken) {
-      const error = new Error('Invalid refresh token');
-      error.statusCode = 401;
-      throw error;
+    // Check Redis, but handle connection/lookup errors gracefully
+    try {
+      const storedToken = await redisClient.get(`refresh:${userId}`);
+      if (storedToken && storedToken !== refreshToken) {
+        const error = new Error('Invalid refresh token');
+        error.statusCode = 401;
+        throw error;
+      }
+    } catch (redisErr) {
+      if (redisErr.statusCode === 401) throw redisErr;
+      console.warn('Redis lookup warning during refresh:', redisErr.message);
     }
 
     const user = await User.findById(userId);
-    if (!user) {
-      const error = new Error('User not found');
+    if (!user || user.status === 'suspended' || user.status === 'rejected') {
+      const error = new Error('User not found or account inactive');
       error.statusCode = 401;
       throw error;
     }
@@ -234,11 +245,12 @@ const refreshTokenService = async (refreshToken) => {
     const newAccessToken = jwt.sign(
       { id: user._id, role: user.role, status: user.status },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '15m' }
+      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
     );
 
     return { accessToken: newAccessToken };
   } catch (err) {
+    if (err.statusCode) throw err;
     const error = new Error('Invalid or expired refresh token');
     error.statusCode = 401;
     throw error;

@@ -179,6 +179,7 @@ function LoginForm() {
                   <Mail className="w-4 h-4" />
                 </div>
                 <input id="login-email" type="email" value={email}
+                  autoComplete="username"
                   onChange={(e) => { setEmail(e.target.value); setError(null); }}
                   onFocus={() => setFocused('email')} onBlur={() => setFocused(null)}
                   placeholder="you@college.edu" required
@@ -202,6 +203,7 @@ function LoginForm() {
                   <Lock className="w-4 h-4" />
                 </div>
                 <input id="login-password" type={showPassword ? "text" : "password"} value={password}
+                  autoComplete="current-password"
                   onChange={(e) => { setPassword(e.target.value); setError(null); }}
                   onFocus={() => setFocused('password')} onBlur={() => setFocused(null)}
                   placeholder="Enter your password" required
@@ -245,7 +247,7 @@ function LoginForm() {
               </div>
               <div className="flex justify-center">
                 <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => toast.error("Google Login Failed")}
-                  theme="filled_black" shape="pill" text="signin_with" width="100%" />
+                  theme="filled_black" shape="pill" text="signin_with" width="320" />
               </div>
             </div>
           </form>

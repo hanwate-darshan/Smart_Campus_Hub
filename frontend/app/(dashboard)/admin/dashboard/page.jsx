@@ -23,7 +23,7 @@ export default function AdminDashboardPage() {
           setStats(data.data);
         }
       } catch (err) {
-        console.error("Failed to fetch dashboard stats", err);
+        // Quietly fail
       } finally {
         setLoading(false);
       }

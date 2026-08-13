@@ -41,7 +41,7 @@ export default function AdminLayout({ children }) {
       setPendingLostFoundCount(data.data.pendingLostFound || 0);
       setPendingMarketplaceCount(data.data.pendingMarketplace || 0);
     } catch (err) {
-      console.error("Failed to fetch admin stats", err);
+      // Quietly ignore
     }
   };
 

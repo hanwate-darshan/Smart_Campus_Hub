@@ -33,7 +33,7 @@ export default function TeacherLayout({ children }) {
       const { data } = await api.get("/api/complaints/stats");
       setPendingComplaintsCount(data.data.pending);
     } catch (err) {
-      console.error("Failed to fetch complaint stats", err);
+      // Quietly ignore
     }
   };
 

@@ -85,7 +85,7 @@ export default function SecurityDashboardPage() {
           }
         }
       } catch (err) {
-        console.error("Failed to fetch active SOS", err);
+        // Quietly fail
       }
     };
     if (user?._id) {
@@ -112,7 +112,6 @@ export default function SecurityDashboardPage() {
     });
 
     socketRef.current.on("connect", () => {
-      console.log("[Security Socket] Connected");
       socketRef.current.emit("join", "security:pool");
       if (activeSOSRef.current?.sosId) {
         socketRef.current.emit("join", `sos:${activeSOSRef.current.sosId}`);
@@ -124,7 +123,7 @@ export default function SecurityDashboardPage() {
       if (dutyStatusRef.current !== "offline" && !activeSOSRef.current) {
         setAlertSOS(payload);
         if (!isMutedRef.current) {
-          audioRef.current.play().catch(e => console.log("Audio play blocked"));
+          audioRef.current.play().catch(() => {});
         }
         if (Notification.permission === "granted") {
           new Notification("🚨 SOS EMERGENCY", {
@@ -142,7 +141,7 @@ export default function SecurityDashboardPage() {
         // Mark as priority so the modal can show a distinct "YOU ARE ASSIGNED" badge
         setAlertSOS({ ...payload, isPriority: true });
         if (!isMutedRef.current) {
-          audioRef.current.play().catch(e => console.log("Audio play blocked"));
+          audioRef.current.play().catch(() => {});
         }
         if (Notification.permission === "granted") {
           new Notification("🚨 SOS — YOU ARE THE NEAREST GUARD", {

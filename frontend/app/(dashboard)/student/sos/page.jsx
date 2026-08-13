@@ -104,7 +104,7 @@ export default function StudentSOSPage() {
           }
         }
       } catch (err) {
-        console.error("Failed to fetch existing SOS", err);
+        // Prevent printing raw Axios err object
       }
     };
     checkExisting();
@@ -125,7 +125,6 @@ export default function StudentSOSPage() {
       });
 
       socketRef.current.on("connect", () => {
-        console.log("[SOS Socket] Connected");
         // Bug #3 Fix: Read from ref — activeSOS state may not be set yet at this point
         if (activeSOSRef.current?._id) {
           socketRef.current.emit("join", `sos:${activeSOSRef.current._id}`);
@@ -145,7 +144,7 @@ export default function StudentSOSPage() {
       });
 
       socketRef.current.on("connect_error", (err) => {
-        console.error("[SOS Socket] Auth Error", err.message);
+        // Connect error handled safely
       });
     }
   }, [sosStatus]);
@@ -170,7 +169,6 @@ export default function StudentSOSPage() {
           setError(null);
         },
         (err) => {
-          console.error("Geolocation Error", err);
           setError("Failed to get your location. Please check browser permissions.");
         },
         { enableHighAccuracy: true }
@@ -222,7 +220,6 @@ export default function StudentSOSPage() {
           locationRef.current = coords;
         },
         (err) => {
-          console.warn("Geolocation warning:", err);
           toast.error("Location access delayed or denied. Defaulting to last known.");
         },
         { enableHighAccuracy: true } // Removed timeout that was causing instant failures

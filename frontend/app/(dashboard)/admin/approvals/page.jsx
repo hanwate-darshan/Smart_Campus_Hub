@@ -5,8 +5,22 @@ import api from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
+import { Eye, FileText, ExternalLink, ShieldCheck, Check, X, AlertCircle, Loader2 } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+const isPdfUrl = (url) => {
+  if (!url) return false;
+  return url.toLowerCase().includes('.pdf') || url.startsWith('data:application/pdf');
+};
+
+const getPdfThumbnailUrl = (url) => {
+  if (!url) return null;
+  if (url.toLowerCase().endsWith('.pdf') && url.includes('cloudinary.com')) {
+    return url.replace(/\.pdf$/i, '.jpg');
+  }
+  return null;
+};
 
 export default function AdminApprovalsPage() {
   const [pendingUsers, setPendingUsers] = useState([]);
@@ -89,7 +103,7 @@ export default function AdminApprovalsPage() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -118,63 +132,147 @@ export default function AdminApprovalsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pendingUsers.map((user) => (
-            <div key={user._id} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col group transition hover:-translate-y-1 hover:shadow-md">
-              <div className="p-5 flex-1 relative">
-                {/* ID Proof Thumbnail */}
-                <div 
-                  className="w-full h-40 bg-slate-100 dark:bg-slate-900 rounded-lg mb-4 cursor-pointer overflow-hidden relative group/img"
-                  onClick={() => setSelectedIdProof(user.idProofUrl)}
-                >
-                  {user.idProofUrl ? (
-                    <img src={user.idProofUrl} alt="ID Proof" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400">No ID Provided</div>
-                  )}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">Click to View</span>
+          {pendingUsers.map((user) => {
+            const isPdf = isPdfUrl(user.idProofUrl);
+            const pdfThumb = getPdfThumbnailUrl(user.idProofUrl);
+
+            return (
+              <div key={user._id} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col group transition hover:-translate-y-1 hover:shadow-md">
+                <div className="p-5 flex-1 relative">
+                  {/* ID Proof Thumbnail */}
+                  <div 
+                    className="w-full h-44 bg-slate-100 dark:bg-slate-900 rounded-lg mb-4 cursor-pointer overflow-hidden relative group/img border border-slate-200 dark:border-slate-700/60"
+                    onClick={() => user.idProofUrl && setSelectedIdProof(user.idProofUrl)}
+                  >
+                    {user.idProofUrl ? (
+                      isPdf ? (
+                        pdfThumb ? (
+                          <div className="w-full h-full relative">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img 
+                              src={pdfThumb} 
+                              alt="PDF ID Proof Preview" 
+                              className="w-full h-full object-cover"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                            <div className="absolute top-2 left-2 px-2 py-1 bg-red-600/90 text-white rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-md">
+                              <FileText className="w-3 h-3" /> PDF Document
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/30 dark:to-slate-900 text-red-600 dark:text-red-400 p-4 text-center">
+                            <FileText className="w-10 h-10 mb-2" />
+                            <span className="text-xs font-bold">PDF ID Document</span>
+                            <span className="text-[11px] opacity-80 mt-1">Click to view or download PDF</span>
+                          </div>
+                        )
+                      ) : (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img 
+                          src={user.idProofUrl} 
+                          alt="ID Proof" 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "https://placehold.co/600x400/1e293b/94a3b8?text=ID+Photo+Unavailable";
+                          }}
+                        />
+                      )
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 p-4 text-center">
+                        <AlertCircle className="w-8 h-8 mb-1 opacity-50" />
+                        <span className="text-xs font-medium">No ID Provided</span>
+                      </div>
+                    )}
+                    
+                    {user.idProofUrl && (
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2 backdrop-blur-[2px]">
+                        <span className="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-lg text-xs font-medium backdrop-blur-md flex items-center gap-1.5">
+                          <Eye className="w-4 h-4" /> View Photo ID
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <h3 className="font-bold text-lg text-slate-800 dark:text-white leading-tight">{user.name}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{user.email}</p>
+                  
+                  <div className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                    <p><span className="font-medium">Phone:</span> {user.phone || 'N/A'}</p>
+                    <p><span className="font-medium">Registered:</span> {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}</p>
                   </div>
                 </div>
 
-                <h3 className="font-bold text-lg text-slate-800 dark:text-white leading-tight">{user.name}</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{user.email}</p>
-                
-                <div className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
-                  <p><span className="font-medium">Phone:</span> {user.phone || 'N/A'}</p>
-                  <p><span className="font-medium">Registered:</span> {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}</p>
+                <div className="grid grid-cols-2 divide-x divide-slate-100 dark:divide-slate-700 border-t border-slate-100 dark:border-slate-700">
+                  <button
+                    disabled={actionLoadingId === user._id}
+                    onClick={() => handleApprove(user._id)}
+                    className="py-3 text-sm font-medium text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition disabled:opacity-50 flex justify-center items-center gap-2"
+                  >
+                    {actionLoadingId === user._id ? <Loader2 className="h-4 w-4 animate-spin text-emerald-600" /> : <><Check className="w-4 h-4" /> Approve</>}
+                  </button>
+                  <button
+                    disabled={actionLoadingId === user._id}
+                    onClick={() => setRejectionModalUser(user)}
+                    className="py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition disabled:opacity-50 flex justify-center items-center gap-2"
+                  >
+                    <X className="w-4 h-4" /> Reject
+                  </button>
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 divide-x divide-slate-100 dark:divide-slate-700 border-t border-slate-100 dark:border-slate-700">
-                <button
-                  disabled={actionLoadingId === user._id}
-                  onClick={() => handleApprove(user._id)}
-                  className="py-3 text-sm font-medium text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition disabled:opacity-50 flex justify-center items-center gap-2"
-                >
-                  {actionLoadingId === user._id ? <div className="h-4 w-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"/> : "Approve"}
-                </button>
-                <button
-                  disabled={actionLoadingId === user._id}
-                  onClick={() => setRejectionModalUser(user)}
-                  className="py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition disabled:opacity-50 flex justify-center items-center gap-2"
-                >
-                  Reject
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {/* ID Proof Modal */}
       {selectedIdProof && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setSelectedIdProof(null)}>
-          <div className="relative max-w-4xl w-full max-h-[90vh] flex justify-center mt-6">
-            <button className="absolute -top-12 right-0 text-white hover:text-slate-300">
-              Close (✕)
-            </button>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={selectedIdProof} alt="Full ID Proof" className="max-w-full max-h-[85vh] rounded-lg shadow-2xl object-contain" onClick={(e) => e.stopPropagation()} />
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" 
+          onClick={() => setSelectedIdProof(null)}
+        >
+          <div 
+            className="relative max-w-4xl w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
+              <h3 className="text-base font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-blue-500" /> Student Photo ID Verification
+              </h3>
+              <div className="flex items-center gap-2">
+                <a
+                  href={selectedIdProof}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white transition flex items-center gap-1.5 shadow-sm"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" /> Open Original File
+                </a>
+                <button
+                  onClick={() => setSelectedIdProof(null)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-auto flex items-center justify-center min-h-[350px] bg-slate-100 dark:bg-slate-950 rounded-xl p-2">
+              {isPdfUrl(selectedIdProof) ? (
+                <iframe 
+                  src={selectedIdProof} 
+                  className="w-full h-[70vh] rounded-lg border-0"
+                  title="PDF ID Viewer"
+                />
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img 
+                  src={selectedIdProof} 
+                  alt="Full ID Proof" 
+                  className="max-w-full max-h-[75vh] rounded-lg shadow-xl object-contain" 
+                />
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -195,7 +293,7 @@ export default function AdminApprovalsPage() {
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
                   className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-sm mb-4 min-h-[80px]"
-                  placeholder="e.g. ID proof is blurry"
+                  placeholder="e.g. ID proof is blurry or invalid"
                 />
                 
                 <div className="flex justify-end gap-3 w-full">
@@ -203,7 +301,7 @@ export default function AdminApprovalsPage() {
                     Cancel
                   </button>
                   <button type="submit" disabled={actionLoadingId !== null} className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition disabled:opacity-70 flex items-center gap-2">
-                    {actionLoadingId !== null && <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"/>}
+                    {actionLoadingId !== null && <Loader2 className="h-4 w-4 animate-spin text-white" />}
                     Confirm Reject
                   </button>
                 </div>

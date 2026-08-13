@@ -56,7 +56,7 @@ export default function SellItemPage() {
         setDuplicateWarning("");
       }
     } catch (err) {
-      console.error("Duplicate check failed", err);
+      // Ignore check error quietly
     }
   };
 

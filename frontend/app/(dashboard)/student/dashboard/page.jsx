@@ -80,7 +80,7 @@ export default function StudentDashboardPage() {
         const { data } = await api.get("/api/notifications?limit=5");
         setActivities(data.data || []);
       } catch (err) {
-        console.error("Failed to fetch activities", err);
+        // Quietly fail to prevent error leak
       } finally {
         setLoadingActivities(false);
       }

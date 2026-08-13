@@ -113,7 +113,7 @@ export default function StudentComplaintsPage() {
         setSimilarInfo(null);
       }
     } catch (err) {
-      console.error("Failed to check similar", err);
+      // Quietly ignore check failure
     }
   };
 
