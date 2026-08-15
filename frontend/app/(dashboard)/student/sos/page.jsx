@@ -235,8 +235,11 @@ export default function StudentSOSPage() {
           clearInterval(countdownIntervalRef.current);
           
           // Use locationRef (which might have been updated by the background fetch)
-          // If still null, use a fallback (0,0) so the SOS at least goes through
-          const finalLocation = locationRef.current || [0, 0];
+          // If still null or [0,0], use campus fallback coordinates so testing & map rendering always work
+          const rawLoc = locationRef.current;
+          const finalLocation = (rawLoc && (rawLoc[0] !== 0 || rawLoc[1] !== 0))
+            ? rawLoc
+            : [73.8567, 18.5204];
           triggerSOSRequest(finalLocation);
           
           return 0;

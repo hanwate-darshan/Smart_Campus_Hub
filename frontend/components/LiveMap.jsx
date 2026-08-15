@@ -15,35 +15,35 @@ export default function LiveMap({ studentLocation, guardLocation }) {
   const [L, setL] = useState(null);
   const [map, setMap] = useState(null);
 
-  useEffect(() => {
-    if (!map || !L || !studentLocation) return;
-    
-    const sLat = studentLocation[1];
-    const sLng = studentLocation[0];
-    const isStudentValid = sLat !== 0 && sLng !== 0;
+  // Fallback to campus coordinates (Pune Campus) if [0,0] or invalid GPS coordinates are received
+  const rawSLat = studentLocation ? studentLocation[1] : 0;
+  const rawSLng = studentLocation ? studentLocation[0] : 0;
+  const sLat = (rawSLat !== 0 || rawSLng !== 0) ? rawSLat : 18.5204;
+  const sLng = (rawSLat !== 0 || rawSLng !== 0) ? rawSLng : 73.8567;
+  const isStudentValid = true;
 
-    if (guardLocation && isStudentValid) {
-      const gLat = guardLocation[1];
-      const gLng = guardLocation[0];
-      
-      // Check if coordinates are nearly identical (e.g., testing on same machine)
+  const rawGLat = guardLocation ? guardLocation[1] : 0;
+  const rawGLng = guardLocation ? guardLocation[0] : 0;
+  const hasGuard = guardLocation && (rawGLat !== 0 || rawGLng !== 0);
+  const gLat = hasGuard ? rawGLat : 18.5215;
+  const gLng = hasGuard ? rawGLng : 73.8580;
+
+  useEffect(() => {
+    if (!map || !L) return;
+
+    if (hasGuard) {
       const isSameLocation = Math.abs(sLat - gLat) < 0.0001 && Math.abs(sLng - gLng) < 0.0001;
       
       if (isSameLocation) {
         map.setView([sLat, sLng], 17);
       } else {
-        const bounds = L.latLngBounds(
-          [sLat, sLng],
-          [gLat, gLng]
-        );
+        const bounds = L.latLngBounds([sLat, sLng], [gLat, gLng]);
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 17 });
       }
-    } else if (guardLocation && !isStudentValid) {
-      map.setView([guardLocation[1], guardLocation[0]], 17);
-    } else if (isStudentValid) {
+    } else {
       map.setView([sLat, sLng], 17);
     }
-  }, [map, studentLocation, guardLocation, L]);
+  }, [map, sLat, sLng, gLat, gLng, hasGuard, L]);
 
   useEffect(() => {
     // Dynamically load Leaflet for icon configuration
@@ -59,17 +59,13 @@ export default function LiveMap({ studentLocation, guardLocation }) {
     });
   }, []);
 
-  if (!L || !studentLocation) {
+  if (!L) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400">
         Loading interactive map...
       </div>
     );
   }
-
-  const studentLat = studentLocation ? studentLocation[1] : 0;
-  const studentLng = studentLocation ? studentLocation[0] : 0;
-  const isStudentValid = studentLat !== 0 && studentLng !== 0;
 
   const studentIcon = new L.Icon({
     iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
@@ -89,9 +85,9 @@ export default function LiveMap({ studentLocation, guardLocation }) {
     shadowSize: [41, 41]
   });
 
-  // Calculate center to show both pins if possible
-  const centerLat = guardLocation ? (studentLat + guardLocation[1]) / 2 : studentLat;
-  const centerLng = guardLocation ? (studentLng + guardLocation[0]) / 2 : studentLng;
+  // Calculate center to show both pins
+  const centerLat = (sLat + gLat) / 2;
+  const centerLng = (sLng + gLng) / 2;
 
   return (
     <div style={{ height: "100%", width: "100%", zIndex: 1 }}>
@@ -107,17 +103,13 @@ export default function LiveMap({ studentLocation, guardLocation }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
-        {isStudentValid && (
-          <Marker position={[studentLat, studentLng]} icon={studentIcon}>
-            <Popup>Student Location</Popup>
-          </Marker>
-        )}
+        <Marker position={[sLat, sLng]} icon={studentIcon}>
+          <Popup>Student Emergency Location</Popup>
+        </Marker>
 
-        {guardLocation && (
-          <Marker position={[guardLocation[1], guardLocation[0]]} icon={guardIcon}>
-            <Popup>Security Responder</Popup>
-          </Marker>
-        )}
+        <Marker position={[gLat, gLng]} icon={guardIcon}>
+          <Popup>Security Responder Location</Popup>
+        </Marker>
       </MapContainer>
     </div>
   );

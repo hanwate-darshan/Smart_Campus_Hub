@@ -64,12 +64,13 @@ export default function SecurityDashboardPage() {
   useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
   useEffect(() => { alertSOSRef.current = alertSOS; }, [alertSOS]);
 
-  // Fetch existing active SOS on mount (in case of page refresh)
+  // Fetch existing active SOS on mount (in case of page refresh or initial load)
   useEffect(() => {
     const fetchActiveSOS = async () => {
       try {
         const { data } = await api.get("/api/sos/active");
         if (data.success && data.data.length > 0) {
+          // 1. Check if assigned to this guard
           const assignedToMe = data.data.find(
             sos => sos.assignedSecurityId?._id === user?._id && ["assigned", "reached"].includes(sos.status)
           );
@@ -82,6 +83,18 @@ export default function SecurityDashboardPage() {
               status: assignedToMe.status
             });
             setDutyStatus("busy");
+          } else {
+            // 2. Check for any pending unassigned active SOS
+            const unassigned = data.data.find(sos => sos.status === "active");
+            if (unassigned) {
+              setAlertSOS({
+                sosId: unassigned._id,
+                studentName: unassigned.studentId?.name || "Student",
+                studentPhone: unassigned.studentId?.phone || "N/A",
+                location: unassigned.location,
+                timestamp: unassigned.createdAt
+              });
+            }
           }
         }
       } catch (err) {
@@ -253,7 +266,7 @@ export default function SecurityDashboardPage() {
       setActiveSOS({ ...alertSOS, status: "assigned" });
       setAlertSOS(null);
       setDutyStatus("busy");
-      audioRef.current.pause();
+      if (audioRef.current) audioRef.current.pause();
       toast.success("SOS Accepted. Navigating to student...");
       
       // Join specific room
@@ -269,7 +282,7 @@ export default function SecurityDashboardPage() {
     } catch (err) {
       toast.error("Failed to accept SOS. It might be already assigned.");
       setAlertSOS(null);
-      audioRef.current.pause();
+      if (audioRef.current) audioRef.current.pause();
     }
   };
 
