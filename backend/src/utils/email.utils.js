@@ -31,4 +31,4 @@ async function sendMail({ to, subject, html, text }) {
   return info;
 }
 
-module.exports = { sendMail };
+module.exports = { sendMail, sendEmail: sendMail };

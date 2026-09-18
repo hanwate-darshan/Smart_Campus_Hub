@@ -4822,3 +4822,9 @@
 2026-08-14 00:50:51:5051 [32minfo[39m: [32m::1 - - [13/Aug/2026:19:20:51 +0000] "GET /api/chat/rooms/6a3e47dbbd99adb3a6e6af5f/messages HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36 Edg/151.0.0.0"[39m
 2026-08-14 01:00:00:00 [32minfo[39m: [32mNo complaints to escalate[39m
 2026-08-14 02:00:00:00 [32minfo[39m: [32mNo complaints to escalate[39m
+2026-09-19 03:55:43:5543 [32minfo[39m: [32mSocket.io Redis adapter connected[39m
+2026-09-19 03:55:47:5547 [32minfo[39m: [32mServer running in development mode on port 5000[39m
+2026-09-19 03:55:48:5548 [32minfo[39m: [32m[JOB] Marketplace Deal Reminder job scheduled (Every 4 hours).[39m
+2026-09-19 03:55:49:5549 [32minfo[39m: [32mComplaint Escalation Job scheduled (Every hour)[39m
+2026-09-19 03:55:49:5549 [32minfo[39m: [32m[JOB] Chat No-Response Auto-Check job scheduled (Every 6 hours).[39m
+2026-09-19 03:55:58:5558 [32minfo[39m: [32m::1 - - [18/Sep/2026:22:25:58 +0000] "GET /api/health HTTP/1.1" 200 74 "-" "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.9444"[39m

@@ -96,4 +96,6 @@ const getIO = () => {
   return io;
 };
 
-module.exports = { initSocket, getIO };
+const getIo = getIO;
+
+module.exports = { initSocket, getIO, getIo };
