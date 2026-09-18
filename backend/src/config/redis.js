@@ -1,24 +1,88 @@
 const { createClient } = require('redis');
 
-let redisClient = createClient({
-    url: process.env.REDIS_URL || 'redis://localhost:6379'
+// In-memory store fallback if Redis connection fails or is unavailable
+const memoryStore = new Map();
+const memoryFallbackClient = {
+  isFallback: true,
+  async get(key) {
+    const item = memoryStore.get(key);
+    if (!item) return null;
+    if (item.expiresAt && item.expiresAt < Date.now()) {
+      memoryStore.delete(key);
+      return null;
+    }
+    return item.value;
+  },
+  async set(key, value, options) {
+    let expiresAt = null;
+    if (options && options.EX) {
+      expiresAt = Date.now() + options.EX * 1000;
+    }
+    memoryStore.set(key, { value: String(value), expiresAt });
+    return 'OK';
+  },
+  async del(key) {
+    const existed = memoryStore.has(key);
+    memoryStore.delete(key);
+    return existed ? 1 : 0;
+  },
+  async connect() { return this; },
+  async disconnect() {},
+  on() { return this; }
+};
+
+let activeClient = memoryFallbackClient;
+
+// Proxy object so any imports of redisClient seamlessly delegate to activeClient
+const redisClient = new Proxy({}, {
+  get(target, prop) {
+    if (activeClient && typeof activeClient[prop] === 'function') {
+      return activeClient[prop].bind(activeClient);
+    }
+    return activeClient ? activeClient[prop] : undefined;
+  }
 });
 
-redisClient.on('error', (err) => console.log('Redis Client Error', err));
-redisClient.on('connect', () => console.log('Redis Client Connected'));
-
 const connectRedis = async () => {
-    try {
-        await redisClient.connect();
-    } catch (err) {
-        console.error('Failed to connect to REDIS_URL, falling back to localhost:', err);
-        // Reinitialize client with localhost fallback
-        const fallbackClient = createClient({ url: 'redis://localhost:6379' });
-        fallbackClient.on('error', (e) => console.log('Fallback Redis Error', e));
-        fallbackClient.on('connect', () => console.log('Fallback Redis Connected'));
-        await fallbackClient.connect();
-        module.exports.redisClient = fallbackClient; // export fallback
-    }
+  const redisUrl = process.env.REDIS_URL;
+  if (!redisUrl) {
+    console.warn('[Redis] No REDIS_URL provided. Running with in-memory fallback.');
+    activeClient = memoryFallbackClient;
+    return activeClient;
+  }
+
+  try {
+    const client = createClient({
+      url: redisUrl,
+      socket: {
+        connectTimeout: 4000,
+        reconnectStrategy: (retries) => {
+          if (retries >= 2) return false; // Stop retrying after 2 attempts
+          return 1000;
+        }
+      }
+    });
+
+    client.on('error', (err) => {
+      // Prevent uncaught error event crash
+    });
+
+    // Timeout promise after 4.5 seconds to guarantee startServer never hangs
+    const connectPromise = client.connect();
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Redis connection timed out after 4500ms')), 4500)
+    );
+
+    await Promise.race([connectPromise, timeoutPromise]);
+    console.log('[Redis] Connected successfully to Redis server');
+    activeClient = client;
+    return client;
+  } catch (err) {
+    console.warn(`[Redis] Connection failed (${err.message}). Using in-memory fallback.`);
+    activeClient = memoryFallbackClient;
+    return activeClient;
+  }
 };
 
 module.exports = { redisClient, connectRedis };
+
